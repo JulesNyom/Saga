@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'screens/books_grid_page.dart';
 
 void main() {
@@ -10,11 +10,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Saga',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        scaffoldBackgroundColor: Colors.black,
+    return CupertinoApp(
+      title: 'Book Collection',
+      theme: const CupertinoThemeData(
+        brightness: Brightness.dark,
+        primaryColor: CupertinoColors.systemBlue,
       ),
       home: BooksGridPage(),
       debugShowCheckedModeBanner: false,

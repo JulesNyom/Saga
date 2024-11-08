@@ -1,5 +1,5 @@
-name: book_app
-description: A Flutter book collection app
+name: saga
+description: A Flutter book collection app with Cupertino design
 publish_to: 'none'
 version: 1.0.0+1
 
