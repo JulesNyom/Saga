@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'tab_screens/library.dart';
 import 'tab_screens/listen.dart';
-import 'tab_screens/Home.dart'; // You'll need to create this file
+import 'tab_screens/home.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -10,20 +10,14 @@ class Homepage extends StatefulWidget {
   State<Homepage> createState() => _HomepageState();
 }
 
-class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+class _HomepageState extends State<Homepage> {
+  int _currentIndex = 0;
+  
+  final List<Widget> _screens = const [
+    Home(),
+    Listen(),
+    Library(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -37,25 +31,43 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Accueil'),
-            Tab(text: 'Écouter'),
-            Tab(text: 'Bibliothèque'),
-          ],
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: Colors.white,
-        ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: const [
-          Home(), 
-          Listen(),
-          Library(),
-        ],
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        child: _screens[_currentIndex],
+      ),
+      bottomNavigationBar: Container(
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          backgroundColor: Colors.black,
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.grey,
+          selectedFontSize: 12,
+          unselectedFontSize: 12,
+          type: BottomNavigationBarType.fixed,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              activeIcon: Icon(Icons.home_filled),
+              label: 'Accueil',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.headphones_outlined),
+              activeIcon: Icon(Icons.headphones),
+              label: 'Écouter',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_add_alt_1_outlined),
+              activeIcon: Icon(Icons.person_add_alt_sharp),
+              label: 'Bibliothèque',
+            ),
+          ],
+        ),
       ),
     );
   }
