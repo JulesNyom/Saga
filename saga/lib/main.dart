@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/HomePage.dart';
+import 'screens/tab_manager.dart';
 
 void main() {
   runApp(const MyApp());
