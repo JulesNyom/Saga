@@ -46,19 +46,22 @@ class _HomeState extends State<Home> {
       body: Stack(
         children: [
           const Positioned(
-            top: 40,
+            top: 10,
             left: 20,
             child: Text(
               'Bonjour',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 30,
+                fontSize: 28,
                 fontWeight: FontWeight.w900,
               ),
             ),
           ),
           // PageView
-          Center(
+           Positioned(
+            top: 70,
+            left: 0,
+            right: 0,
             child: SizedBox(
               height: 400,
               child: PageView.builder(
@@ -71,7 +74,7 @@ class _HomeState extends State<Home> {
                   double scale = _getActualIndex(_currentPage) == actualIndex 
                       ? 1.0 
                       : _scaleFactor;
-
+            
                   return TweenAnimationBuilder(
                     tween: Tween<double>(begin: scale, end: scale),
                     duration: const Duration(milliseconds: 300),
