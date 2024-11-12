@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -13,7 +14,7 @@ class _HomeState extends State<Home> {
   );
   double _currentPage = 0.0;
 
-  // French content for each card
+  // French content for main cards
   final List<Map<String, String>> cardContents = [
     {
       'title': 'Méditation Guidée',
@@ -41,6 +42,19 @@ class _HomeState extends State<Home> {
     },
   ];
 
+  // List of book titles for the grid
+  final List<String> bookTitles = [
+    'Le Pouvoir du Moment Présent',
+    'L\'Art de la Méditation',
+    'Respire',
+    'La Magie du Matin',
+    'Calme et Attentif',
+    'Le Miracle du Mindfulness',
+    'Méditer Jour Après Jour',
+    'La Voie des Émotions',
+    'Le Livre du Hygge',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -64,29 +78,32 @@ class _HomeState extends State<Home> {
     return index % 6;
   }
 
+  void _navigateToListenPage(BuildContext context) {
+    // TODO: Implement navigation to Listen page
+    print('Navigating to Listen page');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          const Positioned(
-            top: 10,
-            left: 20,
-            child: Text(
-              'Bonjour',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.w900,
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 10),
+            const Padding(
+              padding: EdgeInsets.only(left: 20),
+              child: Text(
+                'Bonjour',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
             ),
-          ),
-          Positioned(
-            top: 70,
-            left: 0,
-            right: 0,
-            child: SizedBox(
+            SizedBox(
               height: 400,
               child: PageView.builder(
                 controller: _pageController,
@@ -109,58 +126,98 @@ class _HomeState extends State<Home> {
                         scale: value,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 5),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.blue,
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTapDown: (_) {
+                                // Add haptic feedback for touch
+                                HapticFeedback.lightImpact();
+                              },
+                              onTap: () => _navigateToListenPage(context),
                               borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(20),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    cardContents[actualIndex]['title']!,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
+                              child: StatefulBuilder(
+                                builder: (context, setState) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.blue,
+                                      borderRadius: BorderRadius.circular(30),
                                     ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    cardContents[actualIndex]['description']!,
-                                    style: const TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 16,
+                                    child: Stack(
+                                      children: [
+                                        // Ripple effect container
+                                        Positioned.fill(
+                                          child: Material(
+                                            color: Colors.transparent,
+                                            child: InkWell(
+                                              borderRadius: BorderRadius.circular(30),
+                                              onTapDown: (_) {
+                                                HapticFeedback.lightImpact();
+                                              },
+                                              onTap: () => _navigateToListenPage(context),
+                                            ),
+                                          ),
+                                        ),
+                                        // Content
+                                        Padding(
+                                          padding: const EdgeInsets.all(20),
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                cardContents[actualIndex]['title']!,
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              const SizedBox(height: 10),
+                                              Text(
+                                                cardContents[actualIndex]['description']!,
+                                                style: const TextStyle(
+                                                  color: Colors.white70,
+                                                  fontSize: 16,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              const SizedBox(height: 20),
+                                              Material(
+                                                color: Colors.transparent,
+                                                child: InkWell(
+                                                  onTapDown: (_) {
+                                                    HapticFeedback.lightImpact();
+                                                  },
+                                                  onTap: () => _navigateToListenPage(context),
+                                                  borderRadius: BorderRadius.circular(25),
+                                                  child: Container(
+                                                    padding: const EdgeInsets.symmetric(
+                                                      horizontal: 30,
+                                                      vertical: 12,
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius: BorderRadius.circular(25),
+                                                    ),
+                                                    child: const Text(
+                                                      'Écouter',
+                                                      style: TextStyle(
+                                                        color: Colors.blue,
+                                                        fontSize: 16,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  const SizedBox(height: 20),
-                                  ElevatedButton(
-                                    onPressed: () {},
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.white,
-                                      foregroundColor: Colors.blue,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 30,
-                                        vertical: 12,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(25),
-                                      ),
-                                    ),
-                                    child: const Text(
-                                      'Écouter',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                  );
+                                },
                               ),
                             ),
                           ),
@@ -171,8 +228,72 @@ class _HomeState extends State<Home> {
                 },
               ),
             ),
-          ),
-        ],
+            const Padding(
+              padding: EdgeInsets.fromLTRB(20, 30, 20, 15),
+              child: Text(
+                'Plus de livres',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            GridView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                childAspectRatio: 1,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+              ),
+              itemBuilder: (context, index) {
+                final actualIndex = index % bookTitles.length;
+                return Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTapDown: (_) {
+                      HapticFeedback.lightImpact();
+                    },
+                    onTap: () => _navigateToListenPage(context),
+                    borderRadius: BorderRadius.circular(15),
+                    child: Ink(
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          return Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  bookTitles[actualIndex],
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                );
+              },
+              itemCount: 105,
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
