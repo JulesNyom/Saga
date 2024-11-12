@@ -1,4 +1,3 @@
-// lib/screens/tab_screens/home_tab.dart
 import 'package:flutter/material.dart';
 
 class Home extends StatelessWidget {
@@ -6,10 +5,26 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Contenu de l\'accueil',
-        style: TextStyle(color: Colors.white),
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Container(
+            width: 350,
+            height: 500,
+            decoration: BoxDecoration(
+              color: Colors.blue,
+              borderRadius: BorderRadius.circular(20)
+            ),
+            child: const Center(
+              child: Text(
+                'Contenu de l\'accueil',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
