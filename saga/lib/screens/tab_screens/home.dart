@@ -9,9 +9,37 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final PageController _pageController = PageController(
-    viewportFraction: 0.75, // Reduced from 0.9 to bring items closer together
+    viewportFraction: 0.75,
   );
   double _currentPage = 0.0;
+
+  // French content for each card
+  final List<Map<String, String>> cardContents = [
+    {
+      'title': 'Méditation Guidée',
+      'description': 'Une séance relaxante pour débutants',
+    },
+    {
+      'title': 'Pleine Conscience',
+      'description': 'Pratiques quotidiennes de mindfulness',
+    },
+    {
+      'title': 'Sommeil Profond',
+      'description': 'Aide naturelle pour mieux dormir',
+    },
+    {
+      'title': 'Réduction du Stress',
+      'description': 'Techniques de respiration apaisante',
+    },
+    {
+      'title': 'Concentration',
+      'description': 'Améliorer votre focus au quotidien',
+    },
+    {
+      'title': 'Relaxation',
+      'description': 'Détente musculaire progressive',
+    },
+  ];
 
   @override
   void initState() {
@@ -74,22 +102,65 @@ class _HomeState extends State<Home> {
                   }
 
                   return TweenAnimationBuilder(
-                    duration: const Duration(milliseconds: 200), // Reduced from 350ms to 200ms
+                    duration: const Duration(milliseconds: 200),
                     tween: Tween(begin: scale, end: scale),
                     builder: (context, double value, child) {
                       return Transform.scale(
                         scale: value,
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 5), // Reduced from 10 to 5
+                          padding: const EdgeInsets.symmetric(horizontal: 5),
                           child: Container(
                             decoration: BoxDecoration(
                               color: Colors.blue,
                               borderRadius: BorderRadius.circular(30),
                             ),
-                            child: Center(
-                              child: Text(
-                                'Contenu de l\'accueil ${actualIndex + 1}',
-                                style: const TextStyle(color: Colors.white),
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    cardContents[actualIndex]['title']!,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    cardContents[actualIndex]['description']!,
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 16,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 20),
+                                  ElevatedButton(
+                                    onPressed: () {},
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: Colors.blue,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 30,
+                                        vertical: 12,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(25),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Écouter',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
