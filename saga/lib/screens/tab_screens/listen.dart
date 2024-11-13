@@ -10,146 +10,227 @@ class Listen extends StatefulWidget {
 class _ListenState extends State<Listen> {
   bool isPlaying = false;
   
-  // Mock data for current book
   final Map<String, dynamic> currentBook = {
-    'title': 'The Great Gatsby',
+    'title': 'Gatsby le Magnifique',
     'author': 'F. Scott Fitzgerald',
     'coverUrl': 'https://example.com/cover.jpg',
-    'description': 'Set in the summer of 1922 on Long Island, this American classic follows the mysterious millionaire Jay Gatsby and his obsession with Daisy Buchanan.',
-    'currentChapter': 'Chapter 3',
+    'description': 'Se déroulant pendant l\'été 1922 à Long Island, ce classique américain suit le mystérieux millionnaire Jay Gatsby et son obsession pour Daisy Buchanan.',
+    'currentChapter': 'Chapitre 3',
     'progress': 0.45,
   };
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Now Playing'),
+        backgroundColor: Colors.black,
+        title: const Text(
+          'En lecture',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.more_vert, color: Colors.white),
+            onPressed: () {},
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(24.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Book Card
-              Card(
-                elevation: 4,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Book Cover and Info
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Book Cover
-                          Container(
-                            width: 120,
-                            height: 180,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(Icons.book, size: 50, color: Colors.grey),
-                          ),
-                          const SizedBox(width: 16),
-                          // Book Details
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  currentBook['title'],
-                                  style: Theme.of(context).textTheme.titleLarge,
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'by ${currentBook['author']}',
-                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  currentBook['currentChapter'],
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      // Description
-                      Text(
-                        currentBook['description'],
-                        style: Theme.of(context).textTheme.bodyMedium,
+              // Book Cover
+              Center(
+                child: Container(
+                  width: 300,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[800],
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.1),
+                        blurRadius: 20,
+                        spreadRadius: 2,
                       ),
                     ],
                   ),
+                  child: const Icon(Icons.book, size: 80, color: Colors.white54),
                 ),
               ),
-              const SizedBox(height: 24),
-              // Progress Slider
-              Slider(
-                value: currentBook['progress'],
-                onChanged: (value) {
-                  setState(() {
-                    currentBook['progress'] = value;
-                  });
-                },
+              const SizedBox(height: 32),
+              
+              // Book Title and Author
+              Center(
+                child: Column(
+                  children: [
+                    Text(
+                      currentBook['title'],
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'par ${currentBook['author']}',
+                      style: TextStyle(
+                        color: Colors.grey[400],
+                        fontSize: 16,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      currentBook['currentChapter'],
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 32),
+              
+              // Progress Slider
+              SliderTheme(
+                data: SliderThemeData(
+                  trackHeight: 4,
+                  activeTrackColor: Colors.white,
+                  inactiveTrackColor: Colors.grey[800],
+                  thumbColor: Colors.white,
+                  thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
+                  overlayColor: Colors.white.withOpacity(0.2),
+                  overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
+                ),
+                child: Slider(
+                  value: currentBook['progress'],
+                  onChanged: (value) {
+                    setState(() {
+                      currentBook['progress'] = value;
+                    });
+                  },
+                ),
+              ),
+              
+              // Time indicators
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '14:22',
+                      style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                    ),
+                    Text(
+                      '32:04',
+                      style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 32),
+              
               // Player Controls
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  // Previous Book Button
                   IconButton(
                     icon: const Icon(Icons.skip_previous),
                     iconSize: 32,
-                    onPressed: () {
-                      // Handle previous book
-                    },
+                    color: Colors.white70,
+                    onPressed: () {},
+                    tooltip: 'Chapitre précédent',
                   ),
-                  // Rewind 10 seconds
                   IconButton(
                     icon: const Icon(Icons.replay_10),
                     iconSize: 32,
-                    onPressed: () {
-                      // Handle rewind
-                    },
+                    color: Colors.white70,
+                    onPressed: () {},
+                    tooltip: 'Reculer de 10 secondes',
                   ),
-                  // Play/Pause Button
-                  FloatingActionButton(
-                    onPressed: () {
-                      setState(() {
-                        isPlaying = !isPlaying;
-                      });
-                    },
-                    child: Icon(
-                      isPlaying ? Icons.pause : Icons.play_arrow,
-                      size: 32,
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.white.withOpacity(0.2),
+                          blurRadius: 15,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: FloatingActionButton(
+                      backgroundColor: Colors.white,
+                      onPressed: () {
+                        setState(() {
+                          isPlaying = !isPlaying;
+                        });
+                      },
+                      tooltip: isPlaying ? 'Pause' : 'Lecture',
+                      child: Icon(
+                        isPlaying ? Icons.pause : Icons.play_arrow,
+                        size: 32,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
-                  // Forward 10 seconds
                   IconButton(
                     icon: const Icon(Icons.forward_10),
                     iconSize: 32,
-                    onPressed: () {
-                      // Handle forward
-                    },
+                    color: Colors.white70,
+                    onPressed: () {},
+                    tooltip: 'Avancer de 10 secondes',
                   ),
-                  // Next Book Button
                   IconButton(
                     icon: const Icon(Icons.skip_next),
                     iconSize: 32,
-                    onPressed: () {
-                      // Handle next book
-                    },
+                    color: Colors.white70,
+                    onPressed: () {},
+                    tooltip: 'Chapitre suivant',
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 32),
+              
+              // Additional controls
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.volume_up),
+                    color: Colors.white70,
+                    onPressed: () {},
+                    tooltip: 'Volume',
+                  ),
+                  const SizedBox(width: 32),
+                  IconButton(
+                    icon: const Icon(Icons.speed),
+                    color: Colors.white70,
+                    onPressed: () {},
+                    tooltip: 'Vitesse de lecture',
+                  ),
+                  const SizedBox(width: 32),
+                  IconButton(
+                    icon: const Icon(Icons.timer),
+                    color: Colors.white70,
+                    onPressed: () {},
+                    tooltip: 'Minuterie de sommeil',
                   ),
                 ],
               ),
