@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'tab_screens/library.dart';
+import 'tab_screens/about.dart';
 import 'tab_screens/listen.dart';
 import 'tab_screens/home.dart';
 
@@ -10,13 +10,13 @@ class Homepage extends StatefulWidget {
   State<Homepage> createState() => _HomepageState();
 }
 
-class _HomepageState extends State<Homepage> {
+class _HomepageState extends State<Homepage> with TickerProviderStateMixin {
   int _currentIndex = 0;
-  
+
   final List<Widget> _screens = const [
     Home(),
     Listen(),
-    Library(),
+    About(),
   ];
 
   @override
@@ -27,36 +27,76 @@ class _HomepageState extends State<Homepage> {
         duration: const Duration(milliseconds: 300),
         child: _screens[_currentIndex],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        backgroundColor: Colors.black,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.grey,
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            activeIcon: Icon(Icons.home_filled),
-            label: 'Accueil',
+      bottomNavigationBar: Theme(
+        data: ThemeData(
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+        ),
+        child: Container(
+          color: Colors.black,
+          padding: const EdgeInsets.only(top: 12, bottom: 32, left: 24, right: 24),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildNavItem(
+                0,
+                "Accueil",
+                Icons.home_rounded,
+              ),
+              _buildNavItem(
+                1,
+                "Livres",
+                Icons.menu_book_rounded,
+              ),
+              _buildNavItem(
+                2,
+                "A propos",
+                Icons.person_rounded,
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.headphones_outlined),
-            activeIcon: Icon(Icons.headphones),
-            label: 'Écouter',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_add_alt_1_outlined),
-            activeIcon: Icon(Icons.person_add_alt_sharp),
-            label: 'Bibliothèque',
-          ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(int index, String label, IconData icon) {
+    bool isSelected = _currentIndex == index;
+    
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _currentIndex = index;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF1E1E1E) : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? Colors.white : Colors.grey.shade600,
+              size: 26,
+            ),
+            const SizedBox(height: 6),
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 200),
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                color: isSelected ? Colors.white : Colors.grey.shade600,
+              ),
+              child: Text(label),
+            ),
+          ],
+        ),
       ),
     );
   }
