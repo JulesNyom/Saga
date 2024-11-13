@@ -125,7 +125,7 @@ class _HomeState extends State<Home> {
                       return Transform.scale(
                         scale: value,
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
