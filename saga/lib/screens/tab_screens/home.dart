@@ -10,11 +10,12 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final PageController _pageController = PageController(
-    viewportFraction: 0.85, // Increased for better card visibility
+    viewportFraction: 0.85,
   );
+  final ScrollController _scrollController = ScrollController();
   double _currentPage = 0.0;
+  double _scrollOffset = 0.0;
 
-  // French content for main cards with added gradients and icons
   final List<Map<String, dynamic>> cardContents = [
     {
       'title': 'Méditation Guidée',
@@ -54,7 +55,6 @@ class _HomeState extends State<Home> {
     },
   ];
 
-  // Enhanced book data with colors
   final List<Map<String, dynamic>> books = [
     {
       'title': 'Le Pouvoir du Moment Présent',
@@ -98,13 +98,22 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     _pageController.addListener(_onScroll);
+    _scrollController.addListener(_onMainScroll);
   }
 
   @override
   void dispose() {
     _pageController.removeListener(_onScroll);
+    _scrollController.removeListener(_onMainScroll);
     _pageController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onMainScroll() {
+    setState(() {
+      _scrollOffset = _scrollController.offset;
+    });
   }
 
   void _onScroll() {
@@ -123,44 +132,72 @@ class _HomeState extends State<Home> {
     print('Navigating to Listen page');
   }
 
+  double get _appBarOpacity {
+    const showAt = 20.0;
+    const fullyVisibleAt = 100.0;
+    
+    if (_scrollOffset <= showAt) return 0.0;
+    if (_scrollOffset >= fullyVisibleAt) return 1.0;
+    
+    return (_scrollOffset - showAt) / (fullyVisibleAt - showAt);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.black,
-                Colors.black.withOpacity(0.0),
-              ],
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          child: AppBar(
+            backgroundColor: Colors.black.withOpacity(_appBarOpacity),
+            elevation: _appBarOpacity * 4,
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(_appBarOpacity * 0.8),
+                    Colors.black.withOpacity(0.0),
+                  ],
+                ),
+              ),
             ),
+            title: Opacity(
+              opacity: _appBarOpacity,
+              child: const Text(
+                'Accueil',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+            actions: [
+              Opacity(
+                opacity: _appBarOpacity,
+                child: IconButton(
+                  icon: const Icon(Icons.search, color: Colors.white),
+                  onPressed: () {},
+                ),
+              ),
+              Opacity(
+                opacity: _appBarOpacity,
+                child: IconButton(
+                  icon: const Icon(Icons.account_circle_outlined, color: Colors.white),
+                  onPressed: () {},
+                ),
+              ),
+            ],
           ),
         ),
-        title: const Text('Accueil'),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 22,
-          fontWeight: FontWeight.w900,
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.white),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.account_circle_outlined, color: Colors.white),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: SingleChildScrollView(
+        controller: _scrollController,
         physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -262,7 +299,7 @@ class _HomeState extends State<Home> {
                 final actualIndex = index % books.length;
                 return _buildBookCard(actualIndex);
               },
-              itemCount: 6, // Limiting to 6 items
+              itemCount: 6,
             ),
             const SizedBox(height: 30),
           ],
