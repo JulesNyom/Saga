@@ -45,7 +45,7 @@ class _HomepageState extends State<Homepage> with TickerProviderStateMixin {
               ),
               _buildNavItem(
                 1,
-                "Livres",
+                "Bibliothèque",
                 Icons.menu_book_rounded,
               ),
               _buildNavItem(
