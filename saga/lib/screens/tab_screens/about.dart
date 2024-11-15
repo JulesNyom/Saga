@@ -306,6 +306,7 @@ class _AboutPageState extends State<About> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ),
