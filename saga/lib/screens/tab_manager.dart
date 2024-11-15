@@ -50,7 +50,7 @@ class _HomepageState extends State<Homepage> with TickerProviderStateMixin {
 
 Widget _buildPlaybackBar() {
   return Container(
-    margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8), // Reduced horizontal margin from 16 to 8
+    margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
     decoration: BoxDecoration(
       gradient: const LinearGradient(
         begin: Alignment.topLeft,
@@ -71,13 +71,12 @@ Widget _buildPlaybackBar() {
       ],
     ),
     child: Padding(
-      padding: const EdgeInsets.all(8), // Reduced from 12 to 8
+      padding: const EdgeInsets.all(8),
       child: Row(
         children: [
-          // Book cover
           Container(
-            height: 42, // Reduced from 48
-            width: 42,  // Reduced from 48
+            height: 42,
+            width: 42,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               gradient: const LinearGradient(
@@ -99,11 +98,10 @@ Widget _buildPlaybackBar() {
             child: const Icon(
               Icons.book,
               color: Colors.white,
-              size: 20, // Reduced from 24
+              size: 20,
             ),
           ),
           const SizedBox(width: 12),
-          // Book info
           Expanded(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -113,7 +111,7 @@ Widget _buildPlaybackBar() {
                   _currentBookTitle,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 13, // Reduced from 14
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.3,
                   ),
@@ -124,7 +122,7 @@ Widget _buildPlaybackBar() {
                   _currentChapter,
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.8),
-                    fontSize: 11, // Reduced from 12
+                    fontSize: 11,
                     letterSpacing: 0.2,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -136,13 +134,13 @@ Widget _buildPlaybackBar() {
                       '${_currentPosition.inMinutes}:${(_currentPosition.inSeconds % 60).toString().padLeft(2, '0')}',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.7),
-                        fontSize: 10, // Reduced from 11
+                        fontSize: 10,
                       ),
                     ),
                     Expanded(
                       child: Container(
                         margin: const EdgeInsets.symmetric(horizontal: 8),
-                        height: 2, // Reduced from 3
+                        height: 2,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(1),
                           color: Colors.white.withOpacity(0.2),
@@ -163,7 +161,7 @@ Widget _buildPlaybackBar() {
                       '${_totalDuration.inMinutes}:${(_totalDuration.inSeconds % 60).toString().padLeft(2, '0')}',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.7),
-                        fontSize: 10, // Reduced from 11
+                        fontSize: 10,
                       ),
                     ),
                   ],
@@ -171,13 +169,20 @@ Widget _buildPlaybackBar() {
               ],
             ),
           ),
-          // Controls
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              IconButton(
+                icon: const Icon(
+                  Icons.replay_10_rounded,  
+                  color: Colors.white,
+                  size: 24,
+                ),
+                onPressed: _rewind10Seconds,
+              ),
               Container(
-                height: 42, // Reduced from 48
-                width: 42,  // Reduced from 48
+                height: 42,
+                width: 42,
                 margin: const EdgeInsets.only(left: 8),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -201,18 +206,10 @@ Widget _buildPlaybackBar() {
                   icon: Icon(
                     _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
                     color: const Color(0xFF512DA8),
-                    size: 24, // Reduced from 28
+                    size: 24,
                   ),
                   onPressed: _togglePlayPause,
                 ),
-              ),
-              IconButton(
-                icon: const Icon(
-                  Icons.forward_30_rounded,
-                  color: Colors.white,
-                  size: 24, // Reduced from 28
-                ),
-                onPressed: _forward30Seconds,
               ),
             ],
           ),
