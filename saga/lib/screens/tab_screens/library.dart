@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class Listen extends StatefulWidget {
-  const Listen({super.key});
+class Library extends StatefulWidget {
+  const Library({super.key});
 
   @override
-  State<Listen> createState() => _BooksPageState();
+  State<Library> createState() => _BooksPageState();
 }
 
-class _BooksPageState extends State<Listen> {
+class _BooksPageState extends State<Library> {
   final ScrollController _scrollController = ScrollController();
   double _scrollOffset = 0.0;
 
@@ -91,8 +91,8 @@ class _BooksPageState extends State<Listen> {
 
   void _navigateToListenPage(BuildContext context) {
     HapticFeedback.mediumImpact();
-    // TODO: Implement navigation to Listen page
-    print('Navigating to Listen page');
+    // TODO: Implement navigation to Library page
+    print('Navigating to Library page');
   }
 
   double get _appBarOpacity {
