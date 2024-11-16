@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'tab_screens/about.dart';
 import 'tab_screens/library.dart';
+import 'tab_screens/listening.dart';
 import 'tab_screens/home.dart';
 
 class Homepage extends StatefulWidget {
@@ -21,6 +22,7 @@ class _HomepageState extends State<Homepage> with TickerProviderStateMixin {
   final List<Widget> _screens = const [
     Home(),
     Library(),
+    Listening(),
     About(),
   ];
 
@@ -257,7 +259,8 @@ Widget _buildPlaybackBar() {
                 children: [
                   _buildNavItem(0, "Accueil", Icons.home_rounded),
                   _buildNavItem(1, "Bibliothèque", Icons.menu_book_rounded),
-                  _buildNavItem(2, "A propos", Icons.person_rounded),
+                  _buildNavItem(2, "En cours", Icons.play_arrow_rounded),
+                  _buildNavItem(3, "A propos", Icons.person_rounded),
                 ],
               ),
             ),
