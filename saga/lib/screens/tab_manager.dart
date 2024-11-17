@@ -30,7 +30,6 @@ class _HomepageState extends State<Homepage> with TickerProviderStateMixin {
     setState(() {
       _isPlaying = !_isPlaying;
     });
-    // Add your audio player logic here
   }
 
   void _rewind10Seconds() {
@@ -38,7 +37,6 @@ class _HomepageState extends State<Homepage> with TickerProviderStateMixin {
     setState(() {
       _currentPosition = newPosition.isNegative ? Duration.zero : newPosition;
     });
-    // Add your audio seek logic here
   }
 
   void _forward30Seconds() {
@@ -47,225 +45,189 @@ class _HomepageState extends State<Homepage> with TickerProviderStateMixin {
       _currentPosition =
           newPosition > _totalDuration ? _totalDuration : newPosition;
     });
-    // Add your audio seek logic here
   }
 
-Widget _buildPlaybackBar() {
-  return Container(
-    margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-    decoration: BoxDecoration(
-      gradient: const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          Color(0xFF9C27B0),  // Deep Purple
-          Color(0xFF673AB7),  // Purple
-          Color(0xFF512DA8),  // Deep Purple darker
+  Widget _buildPlaybackBar() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF9C27B0),
+            Color(0xFF673AB7),
+            Color(0xFF512DA8),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF9C27B0).withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
-      borderRadius: BorderRadius.circular(20),
-      boxShadow: [
-        BoxShadow(
-          color: const Color(0xFF9C27B0).withOpacity(0.3),
-          blurRadius: 15,
-          offset: const Offset(0, 4),
-        ),
-      ],
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(8),
-      child: Row(
-        children: [
-          Container(
-            height: 42,
-            width: 42,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFFE1BEE7),
-                  Color(0xFF9C27B0),
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Row(
+          children: [
+            Container(
+              height: 42,
+              width: 42,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFFE1BEE7),
+                    Color(0xFF9C27B0),
+                  ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
                 ],
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              child: const Icon(
+                Icons.book,
+                color: Colors.white,
+                size: 20,
+              ),
             ),
-            child: const Icon(
-              Icons.book,
-              color: Colors.white,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _currentBookTitle,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.3,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  _currentChapter,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
-                    fontSize: 11,
-                    letterSpacing: 0.2,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Text(
-                      '${_currentPosition.inMinutes}:${(_currentPosition.inSeconds % 60).toString().padLeft(2, '0')}',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
-                        fontSize: 10,
-                      ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _currentBookTitle,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
                     ),
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 8),
-                        height: 2,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(1),
-                          color: Colors.white.withOpacity(0.2),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    _currentChapter,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 11,
+                      letterSpacing: 0.2,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Text(
+                        '${_currentPosition.inMinutes}:${(_currentPosition.inSeconds % 60).toString().padLeft(2, '0')}',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 10,
                         ),
-                        child: FractionallySizedBox(
-                          alignment: Alignment.centerLeft,
-                          widthFactor: _currentPosition.inSeconds / _totalDuration.inSeconds,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(1),
-                              color: Colors.white,
+                      ),
+                      Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 8),
+                          height: 2,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(1),
+                            color: Colors.white.withOpacity(0.2),
+                          ),
+                          child: FractionallySizedBox(
+                            alignment: Alignment.centerLeft,
+                            widthFactor: _currentPosition.inSeconds / _totalDuration.inSeconds,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(1),
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    Text(
-                      '${_totalDuration.inMinutes}:${(_totalDuration.inSeconds % 60).toString().padLeft(2, '0')}',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
-                        fontSize: 10,
+                      Text(
+                        '${_totalDuration.inMinutes}:${(_totalDuration.inSeconds % 60).toString().padLeft(2, '0')}',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 10,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                icon: const Icon(
-                  Icons.replay_10_rounded,  
-                  color: Colors.white,
-                  size: 24,
-                ),
-                onPressed: _rewind10Seconds,
-              ),
-              Container(
-                height: 42,
-                width: 42,
-                margin: const EdgeInsets.only(left: 8),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.white.withOpacity(0.9),
-                      Colors.white.withOpacity(0.8),
                     ],
                   ),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: IconButton(
-                  icon: Icon(
-                    _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                    color: const Color(0xFF512DA8),
-                    size: 24,
-                  ),
-                  onPressed: _togglePlayPause,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          // Main content
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            child: _screens[_currentIndex],
-          ),
-
-          // Floating playback bar
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 90,
-            child: _buildPlaybackBar(),
-          ),
-
-          // Bottom navigation with black background
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              color: Colors.black,
-              padding: const EdgeInsets.only(
-                top: 8, // Reduced from 12
-                bottom: 24, // Reduced from 32
-                left: 24,
-                right: 24,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildNavItem(0, "Accueil", Icons.home_rounded),
-                  _buildNavItem(1, "Bibliothèque", Icons.menu_book_rounded),
-                  _buildNavItem(2, "En cours", Icons.play_arrow_rounded),
-                  _buildNavItem(3, "A propos", Icons.person_rounded),
                 ],
               ),
             ),
-          ),
-        ],
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.replay_10_rounded,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                  onPressed: _rewind10Seconds,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+                Container(
+                  height: 42,
+                  width: 42,
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.white.withOpacity(0.9),
+                        Colors.white.withOpacity(0.8),
+                      ],
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                      color: const Color(0xFF512DA8),
+                      size: 24,
+                    ),
+                    onPressed: _togglePlayPause,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.forward_30_rounded,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                  onPressed: _forward30Seconds,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -284,7 +246,7 @@ Widget _buildPlaybackBar() {
         curve: Curves.easeInOut,
         padding: const EdgeInsets.symmetric(
           horizontal: 16,
-          vertical: 8, // Reduced from 12
+          vertical: 8,
         ),
         decoration: BoxDecoration(
           color: isSelected ? const Color(0xFF1E1E1E) : Colors.transparent,
@@ -296,17 +258,60 @@ Widget _buildPlaybackBar() {
             Icon(
               icon,
               color: isSelected ? Colors.white : Colors.grey.shade600,
-              size: 24, // Reduced from 26
+              size: 24,
             ),
-            const SizedBox(height: 4), // Reduced from 6
+            const SizedBox(height: 4),
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 200),
               style: TextStyle(
-                fontSize: 11, // Reduced from 12
+                fontSize: 11,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 color: isSelected ? Colors.white : Colors.grey.shade600,
               ),
               child: Text(label),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: Column(
+          children: [
+            // Main content area that can scroll
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: _screens[_currentIndex],
+              ),
+            ),
+
+            // Playback bar
+            _buildPlaybackBar(),
+
+            // Navigation bar
+            Container(
+              color: Colors.black,
+              padding: const EdgeInsets.only(
+                top: 8,
+                bottom: 16,
+                left: 24,
+                right: 24,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildNavItem(0, "Accueil", Icons.home_rounded),
+                  _buildNavItem(1, "Bibliothèque", Icons.menu_book_rounded),
+                  _buildNavItem(2, "En cours", Icons.play_arrow_rounded),
+                  _buildNavItem(3, "A propos", Icons.person_rounded),
+                ],
+              ),
             ),
           ],
         ),
