@@ -16,81 +16,50 @@ class _HomeState extends State<Home> {
   double _currentPage = 0.0;
   double _scrollOffset = 0.0;
 
-  final List<Map<String, dynamic>> cardContents = [
+  final List<Map<String, dynamic>> featuredBooks = [
     {
-      'title': 'Méditation Guidée',
-      'description': 'Une séance relaxante pour débutants',
-      'gradient': [const Color(0xFF4158D0), const Color(0xFFC850C0)],
-      'icon': Icons.self_improvement,
+      'title': 'Les Misérables',
+      'author': 'Victor Hugo',
+      'description':
+          'Le chef-d\'œuvre de Victor Hugo, une histoire de rédemption',
+      'imageUrl':
+          'https://example.com/placeholder.jpg', // Replace with actual URLs
+      'duration': '24h 30min',
     },
     {
-      'title': 'Pleine Conscience',
-      'description': 'Pratiques quotidiennes de mindfulness',
-      'gradient': [const Color(0xFF43E97B), const Color(0xFF38F9D7)],
-      'icon': Icons.psychology,
+      'title': 'Le Comte de Monte-Cristo',
+      'author': 'Alexandre Dumas',
+      'description': 'Une histoire de vengeance et de justice',
+      'imageUrl': 'https://example.com/placeholder.jpg',
+      'duration': '18h 45min',
     },
     {
-      'title': 'Sommeil Profond',
-      'description': 'Aide naturelle pour mieux dormir',
-      'gradient': [const Color(0xFF0250C5), const Color(0xFF3F51B5)],
-      'icon': Icons.nightlight_round,
-    },
-    {
-      'title': 'Réduction du Stress',
-      'description': 'Techniques de respiration apaisante',
-      'gradient': [const Color(0xFFFF0844), const Color(0xFFFFB199)],
-      'icon': Icons.spa,
-    },
-    {
-      'title': 'Concentration',
-      'description': 'Améliorer votre focus au quotidien',
-      'gradient': [const Color(0xFF396AFC), const Color(0xFF2948FF)],
-      'icon': Icons.leak_add,
-    },
-    {
-      'title': 'Relaxation',
-      'description': 'Détente musculaire progressive',
-      'gradient': [const Color(0xFFFF416C), const Color(0xFFFF4B2B)],
-      'icon': Icons.waves,
+      'title': 'Madame Bovary',
+      'author': 'Gustave Flaubert',
+      'description': 'Le roman réaliste par excellence',
+      'imageUrl': 'https://example.com/placeholder.jpg',
+      'duration': '12h 15min',
     },
   ];
 
-  final List<Map<String, dynamic>> books = [
+  final List<Map<String, dynamic>> recentBooks = [
     {
-      'title': 'Le Pouvoir du Moment Présent',
-      'color': const Color(0xFF1E3D59),
+      'title': 'Notre-Dame de Paris',
+      'author': 'Victor Hugo',
+      'imageUrl': 'https://example.com/placeholder.jpg',
+      'duration': '16h 20min',
     },
     {
-      'title': 'L\'Art de la Méditation',
-      'color': const Color(0xFF17B978),
+      'title': 'Le Rouge et le Noir',
+      'author': 'Stendhal',
+      'imageUrl': 'https://example.com/placeholder.jpg',
+      'duration': '14h 30min',
     },
     {
-      'title': 'Respire',
-      'color': const Color(0xFFFF6B6B),
-    },
-    {
-      'title': 'La Magie du Matin',
-      'color': const Color(0xFF4831D4),
-    },
-    {
-      'title': 'Calme et Attentif',
-      'color': const Color(0xFFCCF381),
-    },
-    {
-      'title': 'Le Miracle du Mindfulness',
-      'color': const Color(0xFF317773),
-    },
-    {
-      'title': 'Méditer Jour Après Jour',
-      'color': const Color(0xFFE2D810),
-    },
-    {
-      'title': 'La Voie des Émotions',
-      'color': const Color(0xFFD92027),
-    },
-    {
-      'title': 'Le Livre du Hygge',
-      'color': const Color(0xFF8E44AD),
+      'title': 'Germinal',
+      'author': 'Émile Zola',
+      'imageUrl': 'https://example.com/placeholder.jpg',
+      'duration': '15h 45min',
     },
   ];
 
@@ -123,7 +92,7 @@ class _HomeState extends State<Home> {
   }
 
   int _getActualIndex(int index) {
-    return index % 6;
+    return index % featuredBooks.length;
   }
 
   void _navigateToListenPage(BuildContext context) {
@@ -135,10 +104,10 @@ class _HomeState extends State<Home> {
   double get _appBarOpacity {
     const showAt = 20.0;
     const fullyVisibleAt = 100.0;
-    
+
     if (_scrollOffset <= showAt) return 0.0;
     if (_scrollOffset >= fullyVisibleAt) return 1.0;
-    
+
     return (_scrollOffset - showAt) / (fullyVisibleAt - showAt);
   }
 
@@ -169,7 +138,7 @@ class _HomeState extends State<Home> {
             title: Opacity(
               opacity: _appBarOpacity,
               child: const Text(
-                'Accueil',
+                'Littérature Audio',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 22,
@@ -188,7 +157,8 @@ class _HomeState extends State<Home> {
               Opacity(
                 opacity: _appBarOpacity,
                 child: IconButton(
-                  icon: const Icon(Icons.account_circle_outlined, color: Colors.white),
+                  icon: const Icon(Icons.account_circle_outlined,
+                      color: Colors.white),
                   onPressed: () {},
                 ),
               ),
@@ -209,7 +179,7 @@ class _HomeState extends State<Home> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Bonjour,',
+                    'Bienvenue,',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 20,
@@ -218,7 +188,7 @@ class _HomeState extends State<Home> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Que souhaitez-vous écouter ?',
+                    'Découvrez nos livres audio',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 28,
@@ -251,7 +221,7 @@ class _HomeState extends State<Home> {
                     builder: (context, double value, child) {
                       return Transform.scale(
                         scale: value,
-                        child: _buildCard(actualIndex),
+                        child: _buildFeaturedCard(actualIndex),
                       );
                     },
                   );
@@ -264,7 +234,7 @@ class _HomeState extends State<Home> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Plus de livres',
+                    'Livres Récents',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -291,13 +261,12 @@ class _HomeState extends State<Home> {
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 1.5,
+                childAspectRatio: 0.75, // Modified for book cover proportions
                 crossAxisSpacing: 15,
                 mainAxisSpacing: 15,
               ),
               itemBuilder: (context, index) {
-                final actualIndex = index % books.length;
-                return _buildBookCard(actualIndex);
+                return _buildBookCard(index % recentBooks.length);
               },
               itemCount: 6,
             ),
@@ -308,20 +277,15 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildCard(int index) {
+  Widget _buildFeaturedCard(int index) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: cardContents[index]['gradient'],
-          ),
           boxShadow: [
             BoxShadow(
-              color: cardContents[index]['gradient'][0].withOpacity(0.3),
+              color: Colors.black.withOpacity(0.3),
               blurRadius: 15,
               offset: const Offset(0, 8),
             ),
@@ -332,22 +296,54 @@ class _HomeState extends State<Home> {
           child: InkWell(
             borderRadius: BorderRadius.circular(30),
             onTap: () => _navigateToListenPage(context),
-            child: Padding(
-              padding: const EdgeInsets.all(25),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    cardContents[index]['icon'],
-                    size: 45,
-                    color: Colors.white.withOpacity(0.9),
+            child: Stack(
+              children: [
+                // Book Cover Image
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(30),
+                  child: Image.network(
+                    featuredBooks[index]['imageUrl'],
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey[900],
+                        child: const Center(
+                          child: Icon(
+                            Icons.book,
+                            color: Colors.white54,
+                            size: 50,
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                  Column(
+                ),
+                // Gradient Overlay
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withOpacity(0.7),
+                        Colors.black.withOpacity(0.9),
+                      ],
+                    ),
+                  ),
+                ),
+                // Content
+                Padding(
+                  padding: const EdgeInsets.all(25),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        cardContents[index]['title'],
+                        featuredBooks[index]['title'],
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 28,
@@ -355,9 +351,18 @@ class _HomeState extends State<Home> {
                           height: 1.2,
                         ),
                       ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Par ${featuredBooks[index]['author']}',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       const SizedBox(height: 10),
                       Text(
-                        cardContents[index]['description'],
+                        featuredBooks[index]['description'],
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.9),
                           fontSize: 16,
@@ -365,39 +370,76 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                       const SizedBox(height: 25),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 25,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.play_arrow,
-                              color: Colors.white,
-                              size: 20,
+                      Wrap(
+                        spacing: 15, // Horizontal space between children
+                        runSpacing: 10, // Vertical space between lines
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20, // Reduced from 25
+                              vertical: 12,
                             ),
-                            SizedBox(width: 8),
-                            Text(
-                              'Écouter',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                          ],
-                        ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize
+                                  .min, // Important: makes Row take minimum space
+                              children: [
+                                Icon(
+                                  Icons.play_arrow,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Écouter',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize
+                                  .min, // Important: makes Row take minimum space
+                              children: [
+                                const Icon(
+                                  Icons.access_time,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  featuredBooks[index]['duration'],
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -413,58 +455,99 @@ class _HomeState extends State<Home> {
         borderRadius: BorderRadius.circular(20),
         child: Container(
           decoration: BoxDecoration(
-            color: books[index]['color'],
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: books[index]['color'].withOpacity(0.3),
+                color: Colors.black.withOpacity(0.2),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
             ],
           ),
-          child: Stack(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Positioned(
-                right: -20,
-                bottom: -20,
-                child: Icon(
-                  Icons.book,
-                  size: 100,
-                  color: Colors.white.withOpacity(0.1),
+              // Book Cover
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(20),
+                  ),
+                  child: Image.network(
+                    recentBooks[index]['imageUrl'],
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey[900],
+                        child: const Center(
+                          child: Icon(
+                            Icons.book,
+                            color: Colors.white54,
+                            size: 40,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(15),
+              // Book Info
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[900],
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(20),
+                  ),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      books[index]['title'],
+                      recentBooks[index]['title'],
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        height: 1.2,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
+                    const SizedBox(height: 4),
+                    Text(
+                      recentBooks[index]['author'],
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 12,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.play_arrow,
-                        color: Colors.white,
-                        size: 16,
-                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          recentBooks[index]['duration'],
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.6),
+                            fontSize: 12,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.play_arrow,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
