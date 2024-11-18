@@ -12,61 +12,48 @@ class _BooksPageState extends State<Library> {
   final ScrollController _scrollController = ScrollController();
   double _scrollOffset = 0.0;
 
-  // Expanded books list with additional details
   final List<Map<String, dynamic>> books = [
     {
-      'title': 'Le Pouvoir du Moment Présent',
-      'author': 'Eckhart Tolle',
-      'duration': '8h 30min',
-      'color': const Color(0xFF1E3D59),
+      'title': 'Les Misérables',
+      'author': 'Victor Hugo',
+      'duration': '24h 30min',
+      'imageUrl': 'https://example.com/placeholder.jpg', // Replace with actual URLs
+      'progress': 0.3, // Optional: Add reading progress
     },
     {
-      'title': 'L\'Art de la Méditation',
-      'author': 'Matthieu Ricard',
-      'duration': '6h 15min',
-      'color': const Color(0xFF17B978),
+      'title': 'Le Comte de Monte-Cristo',
+      'author': 'Alexandre Dumas',
+      'duration': '18h 45min',
+      'imageUrl': 'https://example.com/placeholder.jpg',
+      'progress': 0.5,
     },
     {
-      'title': 'Respire',
-      'author': 'James Nestor',
-      'duration': '7h 45min',
-      'color': const Color(0xFFFF6B6B),
+      'title': 'Madame Bovary',
+      'author': 'Gustave Flaubert',
+      'duration': '12h 15min',
+      'imageUrl': 'https://example.com/placeholder.jpg',
+      'progress': 0.0,
     },
     {
-      'title': 'La Magie du Matin',
-      'author': 'Hal Elrod',
-      'duration': '5h 20min',
-      'color': const Color(0xFF4831D4),
+      'title': 'Notre-Dame de Paris',
+      'author': 'Victor Hugo',
+      'duration': '16h 20min',
+      'imageUrl': 'https://example.com/placeholder.jpg',
+      'progress': 0.7,
     },
     {
-      'title': 'Calme et Attentif',
-      'author': 'Susan Kaiser Greenland',
-      'duration': '4h 50min',
-      'color': const Color(0xFFCCF381),
+      'title': 'Le Rouge et le Noir',
+      'author': 'Stendhal',
+      'duration': '14h 30min',
+      'imageUrl': 'https://example.com/placeholder.jpg',
+      'progress': 0.0,
     },
     {
-      'title': 'Le Miracle du Mindfulness',
-      'author': 'Thich Nhat Hanh',
-      'duration': '6h 40min',
-      'color': const Color(0xFF317773),
-    },
-    {
-      'title': 'Méditer Jour Après Jour',
-      'author': 'Christophe André',
-      'duration': '9h 15min',
-      'color': const Color(0xFFE2D810),
-    },
-    {
-      'title': 'La Voie des Émotions',
-      'author': 'Clarisse Gardet',
-      'duration': '5h 55min',
-      'color': const Color(0xFFD92027),
-    },
-    {
-      'title': 'Le Livre du Hygge',
-      'author': 'Meik Wiking',
-      'duration': '4h 30min',
-      'color': const Color(0xFF8E44AD),
+      'title': 'Germinal',
+      'author': 'Émile Zola',
+      'duration': '15h 45min',
+      'imageUrl': 'https://example.com/placeholder.jpg',
+      'progress': 0.2,
     },
   ];
 
@@ -176,7 +163,7 @@ class _BooksPageState extends State<Library> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Découvrez notre vaste collection de livres audio gratuits.',
+                    'Découvrez notre collection de livres audio classiques.',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.7),
                       fontSize: 16,
@@ -192,12 +179,12 @@ class _BooksPageState extends State<Library> {
             sliver: SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 0.8,
+                childAspectRatio: 0.75, // Modified for book cover proportions
                 crossAxisSpacing: 15,
                 mainAxisSpacing: 15,
               ),
               delegate: SliverChildBuilderDelegate(
-                (context, index) => _buildExpandedBookCard(index),
+                (context, index) => _buildBookCard(index),
                 childCount: books.length,
               ),
             ),
@@ -210,7 +197,7 @@ class _BooksPageState extends State<Library> {
     );
   }
 
-  Widget _buildExpandedBookCard(int index) {
+  Widget _buildBookCard(int index) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -218,100 +205,139 @@ class _BooksPageState extends State<Library> {
         borderRadius: BorderRadius.circular(20),
         child: Container(
           decoration: BoxDecoration(
-            color: books[index]['color'],
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: books[index]['color'].withOpacity(0.3),
+                color: Colors.black.withOpacity(0.2),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
             ],
           ),
-          child: Stack(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Positioned(
-                right: -20,
-                bottom: -20,
-                child: Icon(
-                  Icons.book,
-                  size: 100,
-                  color: Colors.white.withOpacity(0.1),
+              // Book Cover
+              Expanded(
+                flex: 4, // Increased flex ratio for cover
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(20),
+                  ),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.network(
+                        books[index]['imageUrl'],
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey[900],
+                            child: const Center(
+                              child: Icon(
+                                Icons.book,
+                                color: Colors.white54,
+                                size: 40,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      // Progress Overlay
+                      if (books[index]['progress'] > 0)
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.7),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              '${(books[index]['progress'] * 100).toInt()}%',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(15),
+              // Book Info
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[900],
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(20),
+                  ),
+                ),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min, // Added this
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       books[index]['title'],
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        height: 1.2,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
                     Text(
                       books[index]['author'],
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.7),
-                        fontSize: 14,
+                        fontSize: 12,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const Spacer(),
+                    const SizedBox(height: 8), // Reduced spacing
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Icon(
-                          Icons.access_time,
-                          color: Colors.white.withOpacity(0.7),
-                          size: 14,
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.access_time,
+                              color: Colors.white.withOpacity(0.6),
+                              size: 14,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              books[index]['duration'],
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.6),
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 4),
-                        Text(
-                          books[index]['duration'],
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.7),
-                            fontSize: 12,
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
+                          child: const Icon(
                             Icons.play_arrow,
                             color: Colors.white,
                             size: 16,
                           ),
-                          SizedBox(width: 4),
-                          Text(
-                            'Écouter',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
