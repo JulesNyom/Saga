@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -9,65 +11,41 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final PageController _pageController = PageController(
-    viewportFraction: 0.85,
-  );
+  final PageController _pageController = PageController(viewportFraction: 0.85);
   final ScrollController _scrollController = ScrollController();
   double _currentPage = 0.0;
   double _scrollOffset = 0.0;
 
-  final List<Map<String, dynamic>> featuredBooks = [
-    {
-      'title': 'Les Misérables',
-      'author': 'Victor Hugo',
-      'description':
-          'Le chef-d\'œuvre de Victor Hugo, une histoire de rédemption',
-      'imageUrl':
-          'https://example.com/placeholder.jpg', // Replace with actual URLs
-      'duration': '24h 30min',
-    },
-    {
-      'title': 'Le Comte de Monte-Cristo',
-      'author': 'Alexandre Dumas',
-      'description': 'Une histoire de vengeance et de justice',
-      'imageUrl': 'https://example.com/placeholder.jpg',
-      'duration': '18h 45min',
-    },
-    {
-      'title': 'Madame Bovary',
-      'author': 'Gustave Flaubert',
-      'description': 'Le roman réaliste par excellence',
-      'imageUrl': 'https://example.com/placeholder.jpg',
-      'duration': '12h 15min',
-    },
-  ];
-
-  final List<Map<String, dynamic>> recentBooks = [
-    {
-      'title': 'Notre-Dame de Paris',
-      'author': 'Victor Hugo',
-      'imageUrl': 'https://example.com/placeholder.jpg',
-      'duration': '16h 20min',
-    },
-    {
-      'title': 'Le Rouge et le Noir',
-      'author': 'Stendhal',
-      'imageUrl': 'https://example.com/placeholder.jpg',
-      'duration': '14h 30min',
-    },
-    {
-      'title': 'Germinal',
-      'author': 'Émile Zola',
-      'imageUrl': 'https://example.com/placeholder.jpg',
-      'duration': '15h 45min',
-    },
-  ];
+  List<Map<String, dynamic>> featuredBooks = [];
+  List<Map<String, dynamic>> recentBooks = [];
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _pageController.addListener(_onScroll);
     _scrollController.addListener(_onMainScroll);
+    fetchBooks();
+  }
+
+  Future<void> fetchBooks() async {
+    setState(() => isLoading = true);
+    try {
+      // Replace with your API endpoint
+      final response = await http.get(Uri.parse('YOUR_API_ENDPOINT/books'));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          featuredBooks =
+              List<Map<String, dynamic>>.from(data['featured_books']);
+          recentBooks = List<Map<String, dynamic>>.from(data['recent_books']);
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching books: $e');
+      setState(() => isLoading = false);
+    }
   }
 
   @override
@@ -80,39 +58,37 @@ class _HomeState extends State<Home> {
   }
 
   void _onMainScroll() {
-    setState(() {
-      _scrollOffset = _scrollController.offset;
-    });
+    setState(() => _scrollOffset = _scrollController.offset);
   }
 
   void _onScroll() {
-    setState(() {
-      _currentPage = _pageController.page ?? 0;
-    });
+    setState(() => _currentPage = _pageController.page ?? 0);
   }
 
-  int _getActualIndex(int index) {
-    return index % featuredBooks.length;
-  }
+  int _getActualIndex(int index) => index % featuredBooks.length;
 
-  void _navigateToListenPage(BuildContext context) {
+  void _navigateToListenPage(BuildContext context, Map<String, dynamic> book) {
     HapticFeedback.mediumImpact();
-    // TODO: Implement navigation to Listen page
-    print('Navigating to Listen page');
+    // Navigate to listen page with book data
+    print('Navigating to Listen page for: ${book['title']}');
   }
 
   double get _appBarOpacity {
     const showAt = 20.0;
     const fullyVisibleAt = 100.0;
-
     if (_scrollOffset <= showAt) return 0.0;
     if (_scrollOffset >= fullyVisibleAt) return 1.0;
-
     return (_scrollOffset - showAt) / (fullyVisibleAt - showAt);
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
@@ -166,118 +142,126 @@ class _HomeState extends State<Home> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        controller: _scrollController,
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 100),
-            const Padding(
-              padding: EdgeInsets.only(left: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Bienvenue,',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Découvrez nos livres audio',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 30),
-            SizedBox(
-              height: 420,
-              child: PageView.builder(
-                controller: _pageController,
-                physics: const BouncingScrollPhysics(),
-                itemBuilder: (context, index) {
-                  final actualIndex = _getActualIndex(index);
-                  double scale = 1.0;
-                  final difference = index - _currentPage;
-                  if (difference.abs() <= 1) {
-                    scale = 1 - (difference.abs() * 0.1);
-                  } else {
-                    scale = 0.9;
-                  }
-
-                  return TweenAnimationBuilder(
-                    duration: const Duration(milliseconds: 250),
-                    curve: Curves.easeOutCubic,
-                    tween: Tween(begin: scale, end: scale),
-                    builder: (context, double value, child) {
-                      return Transform.scale(
-                        scale: value,
-                        child: _buildFeaturedCard(actualIndex),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 40, 20, 15),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Livres Récents',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      'Voir tout',
+      body: RefreshIndicator(
+        onRefresh: fetchBooks,
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 100),
+              const Padding(
+                padding: EdgeInsets.only(left: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Bienvenue,',
                       style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                        color: Colors.white70,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Découvrez nos livres audio',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 30),
+              if (featuredBooks.isNotEmpty) ...[
+                SizedBox(
+                  height: 420,
+                  child: PageView.builder(
+                    controller: _pageController,
+                    physics: const BouncingScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      final actualIndex = _getActualIndex(index);
+                      double scale = 1.0;
+                      final difference = index - _currentPage;
+                      if (difference.abs() <= 1) {
+                        scale = 1 - (difference.abs() * 0.1);
+                      } else {
+                        scale = 0.9;
+                      }
+
+                      return TweenAnimationBuilder(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOutCubic,
+                        tween: Tween(begin: scale, end: scale),
+                        builder: (context, value, child) {
+                          return Transform.scale(
+                            scale: value,
+                            child: _buildFeaturedCard(actualIndex),
+                          );
+                        },
+                      );
+                    },
                   ),
-                ],
-              ),
-            ),
-            GridView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.75, // Modified for book cover proportions
-                crossAxisSpacing: 15,
-                mainAxisSpacing: 15,
-              ),
-              itemBuilder: (context, index) {
-                return _buildBookCard(index % recentBooks.length);
-              },
-              itemCount: 6,
-            ),
-            const SizedBox(height: 30),
-          ],
+                ),
+              ],
+              if (recentBooks.isNotEmpty) ...[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 40, 20, 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Livres Récents',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {},
+                        child: const Text(
+                          'Voir tout',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                GridView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.75,
+                    crossAxisSpacing: 15,
+                    mainAxisSpacing: 15,
+                  ),
+                  itemBuilder: (context, index) {
+                    return _buildBookCard(index % recentBooks.length);
+                  },
+                  itemCount: recentBooks.length,
+                ),
+              ],
+              const SizedBox(height: 30),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildFeaturedCard(int index) {
+    final book = featuredBooks[index];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
       child: Container(
@@ -295,14 +279,13 @@ class _HomeState extends State<Home> {
           color: Colors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(30),
-            onTap: () => _navigateToListenPage(context),
+            onTap: () => _navigateToListenPage(context, book),
             child: Stack(
               children: [
-                // Book Cover Image
                 ClipRRect(
                   borderRadius: BorderRadius.circular(30),
                   child: Image.network(
-                    featuredBooks[index]['imageUrl'],
+                    book['imageUrl'],
                     fit: BoxFit.cover,
                     width: double.infinity,
                     height: double.infinity,
@@ -320,7 +303,6 @@ class _HomeState extends State<Home> {
                     },
                   ),
                 ),
-                // Gradient Overlay
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(30),
@@ -335,7 +317,6 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                 ),
-                // Content
                 Padding(
                   padding: const EdgeInsets.all(25),
                   child: Column(
@@ -343,7 +324,7 @@ class _HomeState extends State<Home> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        featuredBooks[index]['title'],
+                        book['title'],
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 28,
@@ -353,7 +334,7 @@ class _HomeState extends State<Home> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Par ${featuredBooks[index]['author']}',
+                        'Par ${book['author']}',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.9),
                           fontSize: 18,
@@ -361,22 +342,24 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      Text(
-                        featuredBooks[index]['description'],
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
-                          fontSize: 16,
-                          height: 1.4,
+                      if (book['description'] != null) ...[
+                        Text(
+                          book['description'],
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 16,
+                            height: 1.4,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 25),
+                        const SizedBox(height: 25),
+                      ],
                       Wrap(
-                        spacing: 15, // Horizontal space between children
-                        runSpacing: 10, // Vertical space between lines
+                        spacing: 15,
+                        runSpacing: 10,
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 20, // Reduced from 25
+                              horizontal: 20,
                               vertical: 12,
                             ),
                             decoration: BoxDecoration(
@@ -384,8 +367,7 @@ class _HomeState extends State<Home> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: const Row(
-                              mainAxisSize: MainAxisSize
-                                  .min, // Important: makes Row take minimum space
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
                                   Icons.play_arrow,
@@ -414,8 +396,7 @@ class _HomeState extends State<Home> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Row(
-                              mainAxisSize: MainAxisSize
-                                  .min, // Important: makes Row take minimum space
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 const Icon(
                                   Icons.access_time,
@@ -424,7 +405,36 @@ class _HomeState extends State<Home> {
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
-                                  featuredBooks[index]['duration'],
+                                  book['duration'],
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.headphones,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  book['views'],
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 14,
@@ -448,10 +458,11 @@ class _HomeState extends State<Home> {
   }
 
   Widget _buildBookCard(int index) {
+    final book = recentBooks[index];
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => _navigateToListenPage(context),
+        onTap: () => _navigateToListenPage(context, book),
         borderRadius: BorderRadius.circular(20),
         child: Container(
           decoration: BoxDecoration(
@@ -467,14 +478,13 @@ class _HomeState extends State<Home> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Book Cover
               Expanded(
                 child: ClipRRect(
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(20),
                   ),
                   child: Image.network(
-                    recentBooks[index]['imageUrl'],
+                    book['imageUrl'],
                     fit: BoxFit.cover,
                     width: double.infinity,
                     errorBuilder: (context, error, stackTrace) {
@@ -492,7 +502,6 @@ class _HomeState extends State<Home> {
                   ),
                 ),
               ),
-              // Book Info
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -505,7 +514,7 @@ class _HomeState extends State<Home> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      recentBooks[index]['title'],
+                      book['title'],
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,
@@ -516,7 +525,7 @@ class _HomeState extends State<Home> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      recentBooks[index]['author'],
+                      book['author'],
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.7),
                         fontSize: 12,
@@ -529,7 +538,7 @@ class _HomeState extends State<Home> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          recentBooks[index]['duration'],
+                          book['duration'],
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.6),
                             fontSize: 12,
