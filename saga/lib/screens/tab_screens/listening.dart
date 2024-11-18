@@ -459,22 +459,25 @@ Widget _buildControlButton({
     );
   }
 
-  Widget _buildChapters() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
-          child: Text(
-            'Chapitres',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+ Widget _buildChapters() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Padding(
+        padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+        // Reduced bottom padding to 0
+        child: Text(
+          'Chapitres',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        ListView.builder(
+      ),
+      Transform.translate(
+        offset: const Offset(0, -30), // Move the ListView up by 10 pixels
+        child: ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: chapters.length,
@@ -484,7 +487,7 @@ Widget _buildControlButton({
 
             return ListTile(
               contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
               leading: Container(
                 width: 40,
                 height: 40,
@@ -523,9 +526,10 @@ Widget _buildControlButton({
             );
           },
         ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
 
   Widget _buildRelatedBooks() {
     return Column(
