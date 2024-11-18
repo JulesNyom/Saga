@@ -18,62 +18,66 @@ class _ListenPageState extends State<Listening>
 
   // Sample book data
   final Map<String, dynamic> bookData = {
-    'title': 'Le Pouvoir du Moment Présent',
-    'author': 'Eckhart Tolle',
-    'narrator': 'Jean Dupont',
-    'currentChapter': 'Chapitre 3: Accéder au Pouvoir du Moment Présent',
-    'duration': '45:30',
-    'currentTime': '15:45',
+    'title': 'Les Misérables',
+    'author': 'Victor Hugo',
+    'narrator': 'Jean Martin',
+    'currentChapter': 'Tome 1, Chapitre 3: L\'Évêque Myriel',
+    'duration': '24:30:15',
+    'currentTime': '08:45:30',
     'description':
-        'Dans ce chapitre, Eckhart Tolle nous guide à travers les concepts fondamentaux de la pleine conscience et nous montre comment accéder à la puissance du moment présent. Il explique comment nos pensées et nos émotions peuvent nous empêcher de vivre pleinement l\'instant présent.',
+        'Les Misérables est un roman de Victor Hugo publié en 1862, l\'un des plus vastes et des plus notables de la littérature française. Il décrit la vie de personnages misérables dans Paris et la France provinciale du XIXe siècle.',
     'progress': 35.0,
-    'coverGradient': [const Color(0xFF1E3D59), const Color(0xFF2948FF)],
+    'imageUrl':
+        'https://example.com/placeholder.jpg', // Replace with actual URL
   };
 
   final List<Map<String, dynamic>> chapters = [
     {
       'number': '1',
-      'title': 'Introduction à la Pleine Conscience',
-      'duration': '32:15',
+      'title': 'Un Juste',
+      'duration': '1:32:15',
     },
     {
       'number': '2',
-      'title': 'Le Mental et la Conscience',
-      'duration': '41:30',
+      'title': 'La Chute',
+      'duration': '1:41:30',
     },
     {
       'number': '3',
-      'title': 'Accéder au Pouvoir du Moment Présent',
-      'duration': '45:30',
+      'title': 'L\'Évêque Myriel',
+      'duration': '1:45:30',
       'current': true,
     },
     {
       'number': '4',
-      'title': 'Dissoudre l\'Inconscience',
-      'duration': '38:45',
+      'title': 'Les Œuvres Semblables aux Paroles',
+      'duration': '1:38:45',
     },
     {
       'number': '5',
-      'title': 'La Beauté du Moment Présent',
-      'duration': '36:20',
+      'title': 'Que Monseigneur Bienvenu',
+      'duration': '1:36:20',
     },
   ];
 
   final List<Map<String, dynamic>> relatedBooks = [
     {
-      'title': 'L\'Art de la Méditation',
-      'author': 'Matthieu Ricard',
-      'color': const Color(0xFF17B978),
+      'title': 'Notre-Dame de Paris',
+      'author': 'Victor Hugo',
+      'imageUrl': 'https://example.com/placeholder.jpg',
+      'duration': '18h 45min',
     },
     {
-      'title': 'Le Miracle du Mindfulness',
-      'author': 'Thich Nhat Hanh',
-      'color': const Color(0xFF317773),
+      'title': 'Le Comte de Monte-Cristo',
+      'author': 'Alexandre Dumas',
+      'imageUrl': 'https://example.com/placeholder.jpg',
+      'duration': '21h 30min',
     },
     {
-      'title': 'Méditer Jour Après Jour',
-      'author': 'Christophe André',
-      'color': const Color(0xFFE2D810),
+      'title': 'Germinal',
+      'author': 'Émile Zola',
+      'imageUrl': 'https://example.com/placeholder.jpg',
+      'duration': '19h 15min',
     },
   ];
 
@@ -183,254 +187,251 @@ class _ListenPageState extends State<Listening>
   }
 
   Widget _buildHeader() {
-  return Container(
-    height: 300,
-    decoration: BoxDecoration(
-      gradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: bookData['coverGradient'],
-      ),
-      image: DecorationImage(
-        image: AssetImage('assets/pattern.png'), // Subtle pattern overlay
-        opacity: 0.1,
-        fit: BoxFit.cover,
-      ),
-    ),
-    child: Stack(
-      children: [
-        // Animated background book icon
-        Positioned(
-          right: -80,
-          bottom: -30,
-          child: ShaderMask(
-            shaderCallback: (Rect bounds) {
-              return LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Colors.white.withOpacity(0.2), Colors.white.withOpacity(0)],
-              ).createShader(bounds);
+    return SizedBox(
+      height: 300,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Book Cover Image
+          Image.network(
+            bookData['imageUrl'],
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                color: Colors.grey[900],
+                child: const Center(
+                  child: Icon(
+                    Icons.book,
+                    color: Colors.white54,
+                    size: 50,
+                  ),
+                ),
+              );
             },
-            child: Icon(
-              Icons.auto_stories,
-              size: 220,
-              color: Colors.white,
+          ),
+          // Gradient Overlay
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withOpacity(0.3),
+                  Colors.black.withOpacity(0.7),
+                  Colors.black.withOpacity(0.9),
+                ],
+              ),
             ),
           ),
-        ),
-        // Content
-        SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    'AUDIOBOOK',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1.2,
+          // Content
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  bookData['title'],
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    height: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.person_outline,
-                      size: 16,
-                      color: Colors.white.withOpacity(0.9),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      bookData['author'],
+                    child: Text(
+                      'LIVRE AUDIO',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.9),
-                        fontSize: 16,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1.2,
                       ),
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    bookData['title'],
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      height: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.person_outline,
+                        size: 16,
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        bookData['author'],
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9),
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
-Widget _buildPlayer() {
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Chapter info with icon
-        Row(
-          children: [
-            Icon(
-              Icons.bookmark_outline,
-              size: 20,
-              color: Colors.white.withOpacity(0.9),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                bookData['currentChapter'],
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 24),
-        // Progress bar
-        SliderTheme(
-          data: SliderTheme.of(context).copyWith(
-            activeTrackColor: Colors.white,
-            inactiveTrackColor: Colors.white24,
-            thumbColor: Colors.white,
-            trackHeight: 4.0,
-            thumbShape: const RoundSliderThumbShape(
-              enabledThumbRadius: 6,
-              elevation: 2,
-            ),
-            overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
-          ),
-          child: Slider(
-            value: _currentSliderValue,
-            onChanged: (value) {
-              setState(() {
-                _currentSliderValue = value;
-              });
-            },
-            min: 0.0,
-            max: 100.0,
-          ),
-        ),
-        // Time indicators
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildPlayer() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Text(
-                bookData['currentTime'],
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
+              Icon(
+                Icons.bookmark_outline,
+                size: 20,
+                color: Colors.white.withOpacity(0.9),
               ),
-              Text(
-                bookData['duration'],
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  bookData['currentChapter'],
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
           ),
-        ),
-        const SizedBox(height: 32),
-        // Playback controls
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _buildControlButton(
-              icon: Icons.replay_10_outlined,
-              size: 32,
-              onPressed: () {},
+          const SizedBox(height: 24),
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              activeTrackColor: Colors.white,
+              inactiveTrackColor: Colors.white24,
+              thumbColor: Colors.white,
+              trackHeight: 4.0,
+              thumbShape: const RoundSliderThumbShape(
+                enabledThumbRadius: 6,
+                elevation: 2,
+              ),
+              overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
             ),
-            const SizedBox(width: 16),
-            GestureDetector(
-              onTap: _togglePlayPause,
-              child: Container(
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(36),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+            child: Slider(
+              value: _currentSliderValue,
+              onChanged: (value) {
+                setState(() {
+                  _currentSliderValue = value;
+                });
+              },
+              min: 0.0,
+              max: 100.0,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  bookData['currentTime'],
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.7),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-                child: Center(
-                  child: AnimatedIcon(
-                    icon: AnimatedIcons.play_pause,
-                    progress: _playPauseController,
-                    size: 38,
-                    color: Colors.black,
+                Text(
+                  bookData['duration'],
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.7),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 32),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildControlButton(
+                icon: Icons.replay_10_outlined,
+                size: 32,
+                onPressed: () {},
+              ),
+              GestureDetector(
+                onTap: _togglePlayPause,
+                child: Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(36),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: AnimatedIcon(
+                      icon: AnimatedIcons.play_pause,
+                      progress: _playPauseController,
+                      size: 38,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(width: 16),
-            _buildControlButton(
-              icon: Icons.forward_30_outlined,
-              size: 32,
-              onPressed: () {},
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-}
+              _buildControlButton(
+                icon: Icons.forward_30_outlined,
+                size: 32,
+                onPressed: () {},
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
-Widget _buildControlButton({
-  required IconData icon,
-  required double size,
-  required VoidCallback onPressed,
-}) {
-  return Material(
-    color: Colors.transparent,
-    child: InkWell(
-      borderRadius: BorderRadius.circular(30),
-      onTap: onPressed,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: Icon(
-          icon,
-          color: Colors.white,
-          size: size,
+  Widget _buildControlButton({
+    required IconData icon,
+    required double size,
+    required VoidCallback onPressed,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(30),
+        onTap: onPressed,
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Icon(
+            icon,
+            color: Colors.white,
+            size: size,
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
+
   Widget _buildDescription() {
     return Padding(
       padding: const EdgeInsets.all(20),
@@ -459,25 +460,22 @@ Widget _buildControlButton({
     );
   }
 
- Widget _buildChapters() {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      const Padding(
-        padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-        // Reduced bottom padding to 0
-        child: Text(
-          'Chapitres',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+  Widget _buildChapters() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.fromLTRB(20, 20, 20, 15),
+          child: Text(
+            'Chapitres',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-      ),
-      Transform.translate(
-        offset: const Offset(0, -30), // Move the ListView up by 10 pixels
-        child: ListView.builder(
+        ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: chapters.length,
@@ -501,7 +499,9 @@ Widget _buildControlButton({
                     style: TextStyle(
                       color: isCurrentChapter ? Colors.white : Colors.white70,
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: isCurrentChapter
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                     ),
                   ),
                 ),
@@ -526,10 +526,9 @@ Widget _buildControlButton({
             );
           },
         ),
-      ),
-    ],
-  );
-}
+      ],
+    );
+  }
 
   Widget _buildRelatedBooks() {
     return Column(
@@ -547,7 +546,7 @@ Widget _buildControlButton({
           ),
         ),
         SizedBox(
-          height: 180,
+          height: 200,
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 15),
             scrollDirection: Axis.horizontal,
@@ -563,76 +562,97 @@ Widget _buildControlButton({
                   child: InkWell(
                     onTap: () {},
                     borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: book['color'],
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: book['color'].withOpacity(0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            right: -20,
-                            bottom: -20,
-                            child: Icon(
-                              Icons.book,
-                              size: 100,
-                              color: Colors.white.withOpacity(0.1),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(15),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Book Cover
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Stack(
+                              fit: StackFit.expand,
                               children: [
-                                Text(
-                                  book['title'],
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    height: 1.2,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
+                                Image.network(
+                                  book['imageUrl'],
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      color: Colors.grey[900],
+                                      child: const Center(
+                                        child: Icon(
+                                          Icons.book,
+                                          color: Colors.white54,
+                                          size: 40,
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  book['author'],
-                                  style: TextStyle(
-                                    color: Colors.white.withOpacity(0.7),
-                                    fontSize: 14,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const Spacer(),
+                                // Gradient Overlay
                                 Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: const Icon(
-                                    Icons.play_arrow,
-                                    color: Colors.white,
-                                    size: 16,
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.transparent,
+                                        Colors.black.withOpacity(0.7),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        // Book Info
+                        Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                book['title'],
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                book['author'],
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.7),
+                                  fontSize: 12,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.access_time,
+                                    size: 12,
+                                    color: Colors.white.withOpacity(0.6),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    book['duration'],
+                                    style: TextStyle(
+                                      color: Colors.white.withOpacity(0.6),
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
