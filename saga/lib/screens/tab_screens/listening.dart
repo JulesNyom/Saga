@@ -183,151 +183,252 @@ class _ListenPageState extends State<Listening>
   }
 
   Widget _buildHeader() {
-    return Container(
-      height: 300,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: bookData['coverGradient'],
-        ),
+  return Container(
+    height: 300,
+    decoration: BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: bookData['coverGradient'],
       ),
-      child: Stack(
-        children: [
-          Positioned(
-            right: -100,
-            bottom: -50,
+      image: DecorationImage(
+        image: AssetImage('assets/pattern.png'), // Subtle pattern overlay
+        opacity: 0.1,
+        fit: BoxFit.cover,
+      ),
+    ),
+    child: Stack(
+      children: [
+        // Animated background book icon
+        Positioned(
+          right: -80,
+          bottom: -30,
+          child: ShaderMask(
+            shaderCallback: (Rect bounds) {
+              return LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Colors.white.withOpacity(0.2), Colors.white.withOpacity(0)],
+              ).createShader(bounds);
+            },
             child: Icon(
-              Icons.book,
-              size: 250,
-              color: Colors.white.withOpacity(0.1),
+              Icons.auto_stories,
+              size: 220,
+              color: Colors.white,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(20.0),
+        ),
+        // Content
+        SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    'AUDIOBOOK',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.9),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
                 Text(
                   bookData['title'],
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 32,
+                    fontSize: 36,
                     fontWeight: FontWeight.bold,
+                    height: 1.2,
                   ),
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  'Par ${bookData['author']}',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
-                    fontSize: 18,
-                  ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.person_outline,
+                      size: 16,
+                      color: Colors.white.withOpacity(0.9),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      bookData['author'],
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 
-  Widget _buildPlayer() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            bookData['currentChapter'],
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+Widget _buildPlayer() {
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Chapter info with icon
+        Row(
+          children: [
+            Icon(
+              Icons.bookmark_outline,
+              size: 20,
+              color: Colors.white.withOpacity(0.9),
             ),
-          ),
-          const SizedBox(height: 20),
-          SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              activeTrackColor: Colors.white,
-              inactiveTrackColor: Colors.white24,
-              thumbColor: Colors.white,
-              trackHeight: 4.0,
-            ),
-            child: Slider(
-              value: _currentSliderValue,
-              onChanged: (value) {
-                setState(() {
-                  _currentSliderValue = value;
-                });
-              },
-              min: 0.0,
-              max: 100.0,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  bookData['currentTime'],
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                  ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                bookData['currentChapter'],
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
                 ),
-                Text(
-                  bookData['duration'],
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
+              ),
             ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        // Progress bar
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            activeTrackColor: Colors.white,
+            inactiveTrackColor: Colors.white24,
+            thumbColor: Colors.white,
+            trackHeight: 4.0,
+            thumbShape: const RoundSliderThumbShape(
+              enabledThumbRadius: 6,
+              elevation: 2,
+            ),
+            overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
           ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Slider(
+            value: _currentSliderValue,
+            onChanged: (value) {
+              setState(() {
+                _currentSliderValue = value;
+              });
+            },
+            min: 0.0,
+            max: 100.0,
+          ),
+        ),
+        // Time indicators
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
-                icon:
-                    const Icon(Icons.replay_10, color: Colors.white, size: 35),
-                onPressed: () {},
-              ),
-              const SizedBox(width: 20),
-              GestureDetector(
-                onTap: _togglePlayPause,
-                child: Container(
-                  width: 70,
-                  height: 70,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(35),
-                  ),
-                  child: AnimatedIcon(
-                    icon: AnimatedIcons.play_pause,
-                    progress: _playPauseController,
-                    size: 40,
-                    color: Colors.black,
-                  ),
+              Text(
+                bookData['currentTime'],
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.7),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(width: 20),
-              IconButton(
-                icon:
-                    const Icon(Icons.forward_30, color: Colors.white, size: 35),
-                onPressed: () {},
+              Text(
+                bookData['duration'],
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.7),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ],
           ),
-        ],
-      ),
-    );
-  }
+        ),
+        const SizedBox(height: 32),
+        // Playback controls
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildControlButton(
+              icon: Icons.replay_10_outlined,
+              size: 32,
+              onPressed: () {},
+            ),
+            const SizedBox(width: 16),
+            GestureDetector(
+              onTap: _togglePlayPause,
+              child: Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(36),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: AnimatedIcon(
+                  icon: AnimatedIcons.play_pause,
+                  progress: _playPauseController,
+                  size: 38,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            _buildControlButton(
+              icon: Icons.forward_30_outlined,
+              size: 32,
+              onPressed: () {},
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
 
+Widget _buildControlButton({
+  required IconData icon,
+  required double size,
+  required VoidCallback onPressed,
+}) {
+  return Material(
+    color: Colors.transparent,
+    child: InkWell(
+      borderRadius: BorderRadius.circular(30),
+      onTap: onPressed,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Icon(
+          icon,
+          color: Colors.white,
+          size: size,
+        ),
+      ),
+    ),
+  );
+}
   Widget _buildDescription() {
     return Padding(
       padding: const EdgeInsets.all(20),
