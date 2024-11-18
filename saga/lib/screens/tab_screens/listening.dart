@@ -383,11 +383,13 @@ Widget _buildPlayer() {
                     ),
                   ],
                 ),
-                child: AnimatedIcon(
-                  icon: AnimatedIcons.play_pause,
-                  progress: _playPauseController,
-                  size: 38,
-                  color: Colors.black,
+                child: Center(
+                  child: AnimatedIcon(
+                    icon: AnimatedIcons.play_pause,
+                    progress: _playPauseController,
+                    size: 38,
+                    color: Colors.black,
+                  ),
                 ),
               ),
             ),
