@@ -29,24 +29,33 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> fetchBooks() async {
-    setState(() => isLoading = true);
-    try {
-      // Replace with your API endpoint
-      final response = await http.get(Uri.parse('YOUR_API_ENDPOINT/books'));
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        setState(() {
-          featuredBooks =
-              List<Map<String, dynamic>>.from(data['featured_books']);
-          recentBooks = List<Map<String, dynamic>>.from(data['recent_books']);
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      print('Error fetching books: $e');
-      setState(() => isLoading = false);
+  setState(() => isLoading = true);
+  try {
+    final response = await http.get(Uri.parse('http://localhost:8000/'));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      setState(() {
+        featuredBooks = List<Map<String, dynamic>>.from(data['featured_books']);
+        recentBooks = List<Map<String, dynamic>>.from(data['recent_books']);
+        isLoading = false;
+      });
+    } else {
+      throw Exception('Failed to load books: ${response.statusCode}');
     }
+  } catch (e) {
+    print('Error fetching books: $e');
+    setState(() {
+      isLoading = false;
+      // Show error to user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error loading books: ${e.toString()}'),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    });
   }
+}
 
   @override
   void dispose() {
