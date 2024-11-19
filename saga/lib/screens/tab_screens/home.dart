@@ -23,78 +23,99 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    _pageController.addListener(_onScroll);
+    _pageController.addListener(_onPageScroll);
     _scrollController.addListener(_onMainScroll);
     fetchBooks();
   }
 
-  Future<void> fetchBooks() async {
-  setState(() => isLoading = true);
-  try {
-    final response = await http.get(Uri.parse('http://localhost:8000/'));
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      setState(() {
-        featuredBooks = List<Map<String, dynamic>>.from(data['featured_books']);
-        recentBooks = List<Map<String, dynamic>>.from(data['recent_books']);
-        isLoading = false;
-      });
-    } else {
-      throw Exception('Failed to load books: ${response.statusCode}');
-    }
-  } catch (e) {
-    print('Error fetching books: $e');
-    setState(() {
-      isLoading = false;
-      // Show error to user
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error loading books: ${e.toString()}'),
-          duration: const Duration(seconds: 3),
-        ),
-      );
-    });
-  }
-}
-
   @override
   void dispose() {
-    _pageController.removeListener(_onScroll);
+    _pageController.removeListener(_onPageScroll);
     _scrollController.removeListener(_onMainScroll);
     _pageController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
-  void _onMainScroll() {
-    setState(() => _scrollOffset = _scrollController.offset);
+  Future<void> fetchBooks() async {
+    setState(() => isLoading = true);
+    try {
+      final response = await http.get(Uri.parse('http://localhost:8000/'));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          featuredBooks =
+              List<Map<String, dynamic>>.from(data['featured_books']);
+          recentBooks = List<Map<String, dynamic>>.from(data['recent_books']);
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load books: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching books: $e');
+      setState(() {
+        isLoading = false;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading books: ${e.toString()}'),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      });
+    }
   }
 
-  void _onScroll() {
-    setState(() => _currentPage = _pageController.page ?? 0);
+  void _onMainScroll() {
+    if (mounted) {
+      setState(() {
+        _scrollOffset = _scrollController.offset;
+      });
+    }
+  }
+
+  void _onPageScroll() {
+    if (mounted) {
+      setState(() {
+        _currentPage = _pageController.page ?? 0;
+      });
+    }
   }
 
   int _getActualIndex(int index) => index % featuredBooks.length;
 
   void _navigateToListenPage(BuildContext context, Map<String, dynamic> book) {
     HapticFeedback.mediumImpact();
-    // Navigate to listen page with book data
+    // TODO: Implement navigation to Listen page
     print('Navigating to Listen page for: ${book['title']}');
   }
 
   double get _appBarOpacity {
     const showAt = 20.0;
     const fullyVisibleAt = 100.0;
-    if (_scrollOffset <= showAt) return 0.0;
-    if (_scrollOffset >= fullyVisibleAt) return 1.0;
-    return (_scrollOffset - showAt) / (fullyVisibleAt - showAt);
+
+    final offset = _scrollOffset.clamp(0.0, fullyVisibleAt);
+
+    if (offset <= showAt) {
+      return 0.0;
+    }
+    if (offset >= fullyVisibleAt) {
+      return 1.0;
+    }
+
+    return ((offset - showAt) / (fullyVisibleAt - showAt)).clamp(0.0, 1.0);
   }
 
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        backgroundColor: Colors.black,
+        body: Center(
+          child: CircularProgressIndicator(
+            color: Colors.white,
+          ),
+        ),
       );
     }
 
@@ -105,9 +126,10 @@ class _HomeState extends State<Home> {
         preferredSize: const Size.fromHeight(kToolbarHeight),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
+          color: Colors.transparent,
           child: AppBar(
-            backgroundColor: Colors.black.withOpacity(_appBarOpacity),
             elevation: _appBarOpacity * 4,
+            backgroundColor: Colors.black.withOpacity(_appBarOpacity),
             flexibleSpace: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -120,7 +142,8 @@ class _HomeState extends State<Home> {
                 ),
               ),
             ),
-            title: Opacity(
+            title: AnimatedOpacity(
+              duration: const Duration(milliseconds: 150),
               opacity: _appBarOpacity,
               child: const Text(
                 'Littérature Audio',
@@ -132,14 +155,16 @@ class _HomeState extends State<Home> {
               ),
             ),
             actions: [
-              Opacity(
+              AnimatedOpacity(
+                duration: const Duration(milliseconds: 150),
                 opacity: _appBarOpacity,
                 child: IconButton(
                   icon: const Icon(Icons.search, color: Colors.white),
                   onPressed: () {},
                 ),
               ),
-              Opacity(
+              AnimatedOpacity(
+                duration: const Duration(milliseconds: 150),
                 opacity: _appBarOpacity,
                 child: IconButton(
                   icon: const Icon(Icons.account_circle_outlined,
@@ -151,118 +176,132 @@ class _HomeState extends State<Home> {
           ),
         ),
       ),
-      body: RefreshIndicator(
-        onRefresh: fetchBooks,
-        child: SingleChildScrollView(
-          controller: _scrollController,
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 100),
-              const Padding(
-                padding: EdgeInsets.only(left: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Bienvenue,',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Découvrez nos livres audio',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 30),
-              if (featuredBooks.isNotEmpty) ...[
-                SizedBox(
-                  height: 420,
-                  child: PageView.builder(
-                    controller: _pageController,
-                    physics: const BouncingScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      final actualIndex = _getActualIndex(index);
-                      double scale = 1.0;
-                      final difference = index - _currentPage;
-                      if (difference.abs() <= 1) {
-                        scale = 1 - (difference.abs() * 0.1);
-                      } else {
-                        scale = 0.9;
-                      }
-
-                      return TweenAnimationBuilder(
-                        duration: const Duration(milliseconds: 250),
-                        curve: Curves.easeOutCubic,
-                        tween: Tween(begin: scale, end: scale),
-                        builder: (context, value, child) {
-                          return Transform.scale(
-                            scale: value,
-                            child: _buildFeaturedCard(actualIndex),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
-              if (recentBooks.isNotEmpty) ...[
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 40, 20, 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification notification) {
+          if (notification is ScrollUpdateNotification) {
+            setState(() {
+              _scrollOffset = notification.metrics.pixels;
+            });
+          }
+          return true;
+        },
+        child: RefreshIndicator(
+          onRefresh: fetchBooks,
+          color: Colors.white,
+          backgroundColor: Colors.black,
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: kToolbarHeight + 20),
+                const Padding(
+                  padding: EdgeInsets.only(left: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Livres Récents',
+                      Text(
+                        'Bienvenue,',
                         style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+                          color: Colors.white70,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {},
-                        child: const Text(
-                          'Voir tout',
-                          style: TextStyle(
-                            color: Colors.blue,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Découvrez nos livres audio',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
                         ),
                       ),
                     ],
                   ),
                 ),
-                GridView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.75,
-                    crossAxisSpacing: 15,
-                    mainAxisSpacing: 15,
+                const SizedBox(height: 30),
+                if (featuredBooks.isNotEmpty) ...[
+                  SizedBox(
+                    height: 420,
+                    child: PageView.builder(
+                      controller: _pageController,
+                      physics: const BouncingScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        final actualIndex = _getActualIndex(index);
+                        double scale = 1.0;
+                        final difference = index - _currentPage;
+                        if (difference.abs() <= 1) {
+                          scale = 1 - (difference.abs() * 0.1);
+                        } else {
+                          scale = 0.9;
+                        }
+
+                        return TweenAnimationBuilder(
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeOutCubic,
+                          tween: Tween(begin: scale, end: scale),
+                          builder: (context, value, child) {
+                            return Transform.scale(
+                              scale: value,
+                              child: _buildFeaturedCard(actualIndex),
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
-                  itemBuilder: (context, index) {
-                    return _buildBookCard(index % recentBooks.length);
-                  },
-                  itemCount: recentBooks.length,
-                ),
+                ],
+                if (recentBooks.isNotEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 40, 20, 15),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Livres Récents',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {},
+                          child: const Text(
+                            'Voir tout',
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  GridView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.75,
+                      crossAxisSpacing: 15,
+                      mainAxisSpacing: 15,
+                    ),
+                    itemBuilder: (context, index) {
+                      final actualIndex = index % recentBooks.length;
+                      return _buildBookCard(actualIndex);
+                    },
+                    itemCount: recentBooks.length,
+                  ),
+                ],
+                const SizedBox(height: 30),
               ],
-              const SizedBox(height: 30),
-            ],
+            ),
           ),
         ),
       ),
@@ -350,18 +389,7 @@ class _HomeState extends State<Home> {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      if (book['description'] != null) ...[
-                        Text(
-                          book['description'],
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
-                            fontSize: 16,
-                            height: 1.4,
-                          ),
-                        ),
-                        const SizedBox(height: 25),
-                      ],
+                      const SizedBox(height: 25),
                       Wrap(
                         spacing: 15,
                         runSpacing: 10,
@@ -443,7 +471,7 @@ class _HomeState extends State<Home> {
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
-                                  book['views'],
+                                  '${book['views']} écoutes',
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 14,
@@ -508,6 +536,21 @@ class _HomeState extends State<Home> {
                         ),
                       );
                     },
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        color: Colors.grey[900],
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null,
+                            color: Colors.white,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -546,12 +589,22 @@ class _HomeState extends State<Home> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          book['duration'],
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.6),
-                            fontSize: 12,
-                          ),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.access_time,
+                              color: Colors.white54,
+                              size: 14,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              book['duration'],
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.6),
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
                         ),
                         Container(
                           padding: const EdgeInsets.all(6),
