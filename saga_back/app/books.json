@@ -1,4 +1,314 @@
 {
-  "featured_books": [],
-  "recent_books": []
+  "featured_books": [
+    {
+      "id": "47785",
+      "title": "La Grande Guerre des émeus",
+      "author": "Ahikar",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/Louise-Docker-Photo-dune-emeu-2008-e1667465513112.jpg",
+      "duration": "2 h 40",
+      "views": "637",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/ahikar-auteur-la-grande-guerre-des-emeus.html",
+      "narrator": "Ahikar",
+      "date": "2 novembre 2014"
+    },
+    {
+      "id": "7943",
+      "title": "L’Homme qui plantait des arbres",
+      "author": "Jean Giono",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/Vincent-van-Gogh-Champ-doliviers-juin-1889-scaled-e1661473823820.jpeg",
+      "duration": "28 min",
+      "views": "637",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/jean-giono-lhomme-qui-plantait-des-arbres.html",
+      "narrator": "Juliette",
+      "date": "23 décembre 2009"
+    },
+    {
+      "id": "27704",
+      "title": "David Copperfield",
+      "author": "Charles Dickens",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/Fabienne-e1682678451891.jpg",
+      "duration": "42 h",
+      "views": "471",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/charles-dickens-david-copperfield.html",
+      "narrator": "Victoria",
+      "date": "10 décembre 2011"
+    }
+  ],
+  "recent_books": [
+    {
+      "id": "353184",
+      "title": "Les Fées (Sélection)",
+      "author": "Charlotte-Rose de Caumont La Force",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/2024/11/Edmond-Dulac-fees-e1730745551952.jpg",
+      "duration": "3 h 17",
+      "views": "425",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/les-fees-selection.html",
+      "narrator": "Domi",
+      "date": "13 novembre 2024"
+    },
+    {
+      "id": "353184",
+      "title": "Les Fées (Sélection)",
+      "author": "Unknown Author",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/2024/11/Edmond-Dulac-fees-e1730745551952.jpg",
+      "duration": "3 h 17",
+      "views": "425",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/les-fees-selection.html",
+      "narrator": "",
+      "date": "04/11/2024"
+    },
+    {
+      "id": "352961",
+      "title": "Yeddo",
+      "author": "Pierre Loti",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/2024/10/Maple_Leaves_Koyo_and_Shamisen_by_Kitagawa_Utamaro_c1803.jpg",
+      "duration": "42 min",
+      "views": "419",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/pierre-loti-yeddo.html",
+      "narrator": "Christiane-Jehanne",
+      "date": "14 novembre 2024"
+    },
+    {
+      "id": "353012",
+      "title": "Magellan",
+      "author": "Stefan Zweig",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/2024/10/ReplicaNaoVictoriaMagallanes-350.jpg",
+      "duration": "7 h",
+      "views": "408",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/stefan-zweig-magellan.html",
+      "narrator": "Christiane-Jehanne",
+      "date": "16 novembre 2024"
+    },
+    {
+      "id": "353176",
+      "title": "Horace",
+      "author": "Pierre Corneille",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/2024/11/Henri-de-la-Blanchere_-_Elizabeth_Rachel_Felix-e1730646937763.jpeg",
+      "duration": "1 h 40",
+      "views": "385",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/pierre-corneille-horace.html",
+      "narrator": "Pauline Pucciano",
+      "date": "12 novembre 2024"
+    },
+    {
+      "id": "353176",
+      "title": "Horace",
+      "author": "Unknown Author",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/2024/11/Henri-de-la-Blanchere_-_Elizabeth_Rachel_Felix-e1730646937763.jpeg",
+      "duration": "1 h 40",
+      "views": "385",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/pierre-corneille-horace.html",
+      "narrator": "",
+      "date": "04/11/2024"
+    },
+    {
+      "id": "7884",
+      "title": "Cantique de Noël en prose",
+      "author": "Unknown Author",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/Charles_Dickens_-_Cantique_de_Noel.jpg",
+      "duration": "3 h",
+      "views": "364",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/charles-dickens-cantique-de-noel-en-prose.html",
+      "narrator": "",
+      "date": "16/11/2024"
+    },
+    {
+      "id": "353068",
+      "title": "Le Fil d’or",
+      "author": "Carmen Sylva",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/2024/10/Bobine-de-fil-dor-epais.jpg",
+      "duration": "18 min",
+      "views": "349",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/le-fil-dor.html",
+      "narrator": "Daniel Luttringer",
+      "date": "15 novembre 2024"
+    },
+    {
+      "id": "353246",
+      "title": "Le Besoin d’aimer",
+      "author": "Paul Alexis",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/2024/11/Recueil_Portraits_de_Paul_Alexis_-e1730909597295.jpg",
+      "duration": "8 h",
+      "views": "310",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/paul-alexis-le-besoin-daimer.html",
+      "narrator": "Mon Evasion",
+      "date": "17 novembre 2024"
+    },
+    {
+      "id": "353246",
+      "title": "Le Besoin d’aimer",
+      "author": "Unknown Author",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/2024/11/Recueil_Portraits_de_Paul_Alexis_-e1730909597295.jpg",
+      "duration": "8 h",
+      "views": "310",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/paul-alexis-le-besoin-daimer.html",
+      "narrator": "",
+      "date": "07/11/2024"
+    },
+    {
+      "id": "80236",
+      "title": "Dracula (Partie 1)",
+      "author": "Bram Stoker",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/Edvard_Munch_-_Vampire_1893_Munchmuseet-e1647548213470.jpg",
+      "duration": "5 h",
+      "views": "285",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/stoker-bram-dracula-partie-01.html",
+      "narrator": "Projet collectif",
+      "date": "25 décembre 2019"
+    },
+    {
+      "id": "18480",
+      "title": "Le Chat, la belette et le petit lapin",
+      "author": "La Fontaine",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/Le-Chat-la-belette-et-le-petit-lapin-e1667079522754.jpeg",
+      "duration": "3 min",
+      "views": "255",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/jean-de-la-fontaine-le-chat-la-belette-et-le-petit-lapin.html",
+      "narrator": "Cocotte",
+      "date": "24 mars 2011"
+    },
+    {
+      "id": "35155",
+      "title": "Les Plaideurs",
+      "author": "Jean Racine",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/Jean-Racine-e1665676090555.jpeg",
+      "duration": "57 min",
+      "views": "215",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/jean-racine-les-plaideurs.html",
+      "narrator": "Projet collectif",
+      "date": "22 novembre 2012"
+    },
+    {
+      "id": "32156",
+      "title": "Augustine de Villeblanche",
+      "author": "Marquis de Sade",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/Francois-Boucher-Jupiter-et-Callisto-1-e1666553407219.jpeg",
+      "duration": "28 min",
+      "views": "203",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/sade-marquis-de-augustine-de-villeblanche.html",
+      "narrator": "Cocotte",
+      "date": "3 juillet 2012"
+    },
+    {
+      "id": "353310",
+      "title": "Tragédie prussienne",
+      "author": "Gaston-Charles Richard",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/2024/11/Gaston-Chares_Richard_Tragedie_prussienne.jpg",
+      "duration": "37 min",
+      "views": "171",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/gaston-charles-richard-tragedie-prussienne.html",
+      "narrator": "Cocotte",
+      "date": "18 novembre 2024"
+    },
+    {
+      "id": "353310",
+      "title": "Tragédie prussienne",
+      "author": "Unknown Author",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/2024/11/Gaston-Chares_Richard_Tragedie_prussienne.jpg",
+      "duration": "37 min",
+      "views": "171",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/gaston-charles-richard-tragedie-prussienne.html",
+      "narrator": "",
+      "date": "08/11/2024"
+    },
+    {
+      "id": "53650",
+      "title": "Les Contes du Manoir rose",
+      "author": "Yvonne Gaudeau",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/Portrait-de-Yvonne-Gaudeau-e1668627234855.jpeg",
+      "duration": "2 h 48",
+      "views": "166",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/yvonne-gaudeau-les-contes-du-manoir-rose.html",
+      "narrator": "Pauline Pucciano",
+      "date": "12 octobre 2015"
+    },
+    {
+      "id": "4680",
+      "title": "Les Rêveries du promeneur solitaire",
+      "author": "J.-J. Rousseau",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/Pierre-Auguste-Renoir-La-Seine-a-Chatou-1881-e1661518582191.jpeg",
+      "duration": "4 h 51",
+      "views": "152",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/rousseau-jean-jacques-les-reveries-du-promeneur-solitaire.html",
+      "narrator": "Pomme",
+      "date": "21 avril 2009"
+    },
+    {
+      "id": "31784",
+      "title": "La Jeunesse de Pierrot",
+      "author": "Alexandre Dumas",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/La-Jeunesse-de-Pierrot-illustration-dIsabelle.jpg",
+      "duration": "2 h 37",
+      "views": "150",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/alexandre-dumas-la-jeunesse-de-pierrot.html",
+      "narrator": "Cocotte",
+      "date": "10 juin 2012"
+    },
+    {
+      "id": "34040",
+      "title": "L’Adresse tragique",
+      "author": "Shmuel Retbi",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/Photographie-de-Kenyh-Cevarom-Train-leger-a-Jerusalem-Israel-Jaffa-Road-2012-e1673986480707.png",
+      "duration": "34 min",
+      "views": "129",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/shmuel-retbi-ladresse-tragique.html",
+      "narrator": "Plume",
+      "date": "11 octobre 2012"
+    },
+    {
+      "id": "26070",
+      "title": "Nocturne (Poème)",
+      "author": "Charles Cros",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/Charles-Cros-photographie-par-Nadar-vers-1860-1870-e1661377811334-300x300.webp",
+      "duration": "5 min",
+      "views": "105",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/cros-charles-nocturne-poeme.html",
+      "narrator": "Cocotte",
+      "date": "13 septembre 2011"
+    },
+    {
+      "id": "352346",
+      "title": "Les filles de Lord Oakburn (Tome 1)",
+      "author": "Unknown Author",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/2024/09/Awaiting_the_suitor_unknown_date_by_Gustave_Leonard_de_Jonghe.jpg",
+      "duration": "12 h",
+      "views": "41",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/mrs-henry-wood-les-filles-de-lord-oakburn-tome-1.html",
+      "narrator": "",
+      "date": "14/11/2024"
+    },
+    {
+      "id": "350122",
+      "title": "Le Pont des Soupirs",
+      "author": "Unknown Author",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/2024/06/Gustave-Dore-Le-pont-des-soupirs-1870.jpg",
+      "duration": "13 h",
+      "views": "26",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/michel-zevaco-le-pont-des-soupirs.html",
+      "narrator": "",
+      "date": "11/11/2024"
+    },
+    {
+      "id": "353151",
+      "title": "La Source, suivi de La Nuit de la Mort de Vaillant",
+      "author": "Louise Michel",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/2024/10/Louise_Michel.jpg",
+      "duration": "5 min",
+      "views": "2",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/louise-michel-la-source-suivi-de-la-nuit-de-la-mort-de-vaillant.html",
+      "narrator": "Christiane-Jehanne",
+      "date": "19 novembre 2024"
+    },
+    {
+      "id": "353151",
+      "title": "La Source, suivi de La Nuit de la Mort de Vaillant",
+      "author": "Unknown Author",
+      "imageUrl": "https://www.litteratureaudio.com/wp-content/uploads/2024/10/Louise_Michel.jpg",
+      "duration": "5 min",
+      "views": "2",
+      "url": "https://www.litteratureaudio.com/livre-audio-gratuit-mp3/louise-michel-la-source-suivi-de-la-nuit-de-la-mort-de-vaillant.html",
+      "narrator": "",
+      "date": "04/11/2024"
+    }
+  ]
 }

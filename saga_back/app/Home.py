@@ -1,12 +1,24 @@
-import requests
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from typing import List, Optional
+from pydantic import BaseModel
 from bs4 import BeautifulSoup
-import json
-from typing import Dict, List
+import requests
 import re
-from dataclasses import dataclass, asdict
+from datetime import datetime
 
-@dataclass
-class AudioBook:
+app = FastAPI(title="Litterature Audio API")
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins in development
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+class AudioBook(BaseModel):
     id: str
     title: str
     author: str
@@ -14,8 +26,12 @@ class AudioBook:
     duration: str
     views: str
     url: str
-    narrator: str = ""
-    date: str = ""
+    narrator: Optional[str] = ""
+    date: Optional[str] = ""
+
+class BooksResponse(BaseModel):
+    featured_books: List[AudioBook]
+    recent_books: List[AudioBook]
 
 class LitteratureAudioScraper:
     def __init__(self):
@@ -25,20 +41,16 @@ class LitteratureAudioScraper:
         }
 
     def clean_url(self, url: str) -> str:
-        """Remove size constraints from image URLs"""
         if not url:
             return ''
         return re.sub(r'-\d+x\d+(?=\.(jpg|jpeg|png))', '', url)
 
     def extract_views(self, views_element) -> str:
-        """Extract view count from the views element"""
         if not views_element:
             return "0"
-        # Remove all non-digit characters
         return re.sub(r'\D', '', views_element.text.strip())
 
-    def extract_book_data(self, article) -> AudioBook:
-        """Extract all relevant data from a book article element"""
+    def extract_book_data(self, article) -> Optional[AudioBook]:
         try:
             # Extract title and URL
             title_elem = article.select_one('h3.entry-title a')
@@ -87,51 +99,51 @@ class LitteratureAudioScraper:
             print(f"Error extracting data from article: {e}")
             return None
 
-    def scrape_books(self, limit: int = 10) -> Dict[str, List[Dict]]:
-        """Scrape books and return them separated into featured and recent"""
+    async def scrape_books(self, limit: int = 10) -> BooksResponse:
         try:
             response = requests.get(self.base_url, headers=self.headers)
-            soup = BeautifulSoup(response.text, 'lxml')
+            response.raise_for_status()  # Raise an exception for bad status codes
             
-            # Find all book elements
+            soup = BeautifulSoup(response.text, 'lxml')
             articles = soup.find_all('article', class_='block-loop-item')
             
-            # Process all books
             all_books = []
             for article in articles:
                 book = self.extract_book_data(article)
                 if book:
                     all_books.append(book)
             
-            # Separate into featured and recent based on views
+            # Sort books by views and split into featured and recent
             sorted_books = sorted(all_books, key=lambda x: int(x.views) if x.views.isdigit() else 0, reverse=True)
             featured_books = sorted_books[:3]
             recent_books = sorted_books[3:]
 
-            return {
-                'featured_books': [asdict(book) for book in featured_books],
-                'recent_books': [asdict(book) for book in recent_books]
-            }
+            return BooksResponse(
+                featured_books=featured_books,
+                recent_books=recent_books
+            )
             
+        except requests.RequestException as e:
+            raise HTTPException(status_code=503, detail=f"Error fetching data: {str(e)}")
         except Exception as e:
-            print(f"An error occurred while scraping: {e}")
-            return {'featured_books': [], 'recent_books': []}
+            raise HTTPException(status_code=500, detail=f"Server error: {str(e)}")
 
-    def save_to_json(self, data: Dict[str, List[Dict]], filename: str = 'books.json'):
-        """Save the scraped data to a JSON file"""
-        with open(filename, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
+# Initialize scraper
+scraper = LitteratureAudioScraper()
 
-def main():
-    scraper = LitteratureAudioScraper()
-    books_data = scraper.scrape_books(limit=20)  # Scrape 20 books total
-    scraper.save_to_json(books_data)
-    print(f"Scraped {len(books_data['featured_books'])} featured books and {len(books_data['recent_books'])} recent books")
-    
-    # Print first book as example
-    if books_data['featured_books']:
-        print("\nExample of first featured book:")
-        print(json.dumps(books_data['featured_books'][0], indent=2, ensure_ascii=False))
+@app.get("/", response_model=BooksResponse)
+async def get_books(limit: int = 10):
+    """
+    Get audio books from Litterature Audio.
+    Returns featured and recent books.
+    """
+    return await scraper.scrape_books(limit)
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint"""
+    return {"status": "healthy", "timestamp": datetime.now().isoformat()}
 
 if __name__ == "__main__":
-    main()
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
