@@ -1,85 +1,133 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+class AudioBook {
+  final String id;
+  final String title;
+  final String author;
+  final String imageUrl;
+  final String duration;
+  final String narrator;
+  final String date;
+  final String views;
+  final String url;
+  double progress;
+
+  AudioBook({
+    required this.id,
+    required this.title,
+    required this.author,
+    required this.imageUrl,
+    required this.duration,
+    required this.narrator,
+    required this.date,
+    required this.views,
+    required this.url,
+    this.progress = 0.0,
+  });
+
+  factory AudioBook.fromJson(Map<String, dynamic> json) {
+    return AudioBook(
+      id: json['id'],
+      title: json['title'],
+      author: json['author'],
+      imageUrl: json['imageUrl'],
+      duration: json['duration'],
+      narrator: json['narrator'] ?? '',
+      date: json['date'] ?? '',
+      views: json['views'],
+      url: json['url'],
+    );
+  }
+}
 
 class Library extends StatefulWidget {
   const Library({super.key});
 
   @override
-  State<Library> createState() => _BooksPageState();
+  State<Library> createState() => _LibraryState();
 }
 
-class _BooksPageState extends State<Library> {
+class _LibraryState extends State<Library> {
   final ScrollController _scrollController = ScrollController();
   double _scrollOffset = 0.0;
-
-  final List<Map<String, dynamic>> books = [
-    {
-      'title': 'Les Misérables',
-      'author': 'Victor Hugo',
-      'duration': '24h 30min',
-      'imageUrl': 'https://example.com/placeholder.jpg', // Replace with actual URLs
-      'progress': 0.3, // Optional: Add reading progress
-    },
-    {
-      'title': 'Le Comte de Monte-Cristo',
-      'author': 'Alexandre Dumas',
-      'duration': '18h 45min',
-      'imageUrl': 'https://example.com/placeholder.jpg',
-      'progress': 0.5,
-    },
-    {
-      'title': 'Madame Bovary',
-      'author': 'Gustave Flaubert',
-      'duration': '12h 15min',
-      'imageUrl': 'https://example.com/placeholder.jpg',
-      'progress': 0.0,
-    },
-    {
-      'title': 'Notre-Dame de Paris',
-      'author': 'Victor Hugo',
-      'duration': '16h 20min',
-      'imageUrl': 'https://example.com/placeholder.jpg',
-      'progress': 0.7,
-    },
-    {
-      'title': 'Le Rouge et le Noir',
-      'author': 'Stendhal',
-      'duration': '14h 30min',
-      'imageUrl': 'https://example.com/placeholder.jpg',
-      'progress': 0.0,
-    },
-    {
-      'title': 'Germinal',
-      'author': 'Émile Zola',
-      'duration': '15h 45min',
-      'imageUrl': 'https://example.com/placeholder.jpg',
-      'progress': 0.2,
-    },
-  ];
+  List<AudioBook> books = [];
+  bool isLoading = false;
+  bool hasMoreBooks = true;
+  int currentPage = 1;
+  int totalPages = 1;
 
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_onMainScroll);
+    _scrollController.addListener(_onScroll);
+    _fetchBooks();
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onMainScroll);
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
   }
 
-  void _onMainScroll() {
+  void _onScroll() {
     setState(() {
       _scrollOffset = _scrollController.offset;
     });
+
+    // Check if we're near the bottom
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      _loadMoreBooks();
+    }
   }
 
-  void _navigateToListenPage(BuildContext context) {
-    HapticFeedback.mediumImpact();
-    // TODO: Implement navigation to Library page
-    print('Navigating to Library page');
+  Future<void> _fetchBooks() async {
+    if (isLoading || !hasMoreBooks) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final response = await http.get(
+        Uri.parse('http://your-api-url/popular?page=$currentPage'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final List<AudioBook> newBooks = (data['books'] as List)
+            .map((book) => AudioBook.fromJson(book))
+            .toList();
+
+        setState(() {
+          books.addAll(newBooks);
+          totalPages = data['total_pages'];
+          hasMoreBooks = currentPage < totalPages;
+          currentPage++;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        // Handle error
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      // Handle error
+    }
+  }
+
+  Future<void> _loadMoreBooks() async {
+    if (!isLoading && hasMoreBooks) {
+      await _fetchBooks();
+    }
   }
 
   double get _appBarOpacity {
@@ -179,7 +227,7 @@ class _BooksPageState extends State<Library> {
             sliver: SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 0.75, // Modified for book cover proportions
+                childAspectRatio: 0.75,
                 crossAxisSpacing: 15,
                 mainAxisSpacing: 15,
               ),
@@ -189,6 +237,34 @@ class _BooksPageState extends State<Library> {
               ),
             ),
           ),
+          if (isLoading)
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          if (hasMoreBooks && !isLoading)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Center(
+                  child: FloatingActionButton(
+                    backgroundColor: Colors.white,
+                    mini: true,
+                    child: const Icon(
+                      Icons.add,
+                      color: Colors.black,
+                    ),
+                    onPressed: _loadMoreBooks,
+                  ),
+                ),
+              ),
+            ),
           const SliverToBoxAdapter(
             child: SizedBox(height: 30),
           ),
@@ -198,10 +274,12 @@ class _BooksPageState extends State<Library> {
   }
 
   Widget _buildBookCard(int index) {
+    final book = books[index];
+    
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => _navigateToListenPage(context),
+        onTap: () => _navigateToListenPage(context, book),
         borderRadius: BorderRadius.circular(20),
         child: Container(
           decoration: BoxDecoration(
@@ -217,9 +295,8 @@ class _BooksPageState extends State<Library> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Book Cover
               Expanded(
-                flex: 4, // Increased flex ratio for cover
+                flex: 4,
                 child: ClipRRect(
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(20),
@@ -228,7 +305,7 @@ class _BooksPageState extends State<Library> {
                     fit: StackFit.expand,
                     children: [
                       Image.network(
-                        books[index]['imageUrl'],
+                        book.imageUrl,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
@@ -243,8 +320,7 @@ class _BooksPageState extends State<Library> {
                           );
                         },
                       ),
-                      // Progress Overlay
-                      if (books[index]['progress'] > 0)
+                      if (book.progress > 0)
                         Positioned(
                           top: 8,
                           right: 8,
@@ -258,7 +334,7 @@ class _BooksPageState extends State<Library> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
-                              '${(books[index]['progress'] * 100).toInt()}%',
+                              '${(book.progress * 100).toInt()}%',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 12,
@@ -271,7 +347,6 @@ class _BooksPageState extends State<Library> {
                   ),
                 ),
               ),
-              // Book Info
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -281,11 +356,11 @@ class _BooksPageState extends State<Library> {
                   ),
                 ),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min, // Added this
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      books[index]['title'],
+                      book.title,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,
@@ -296,7 +371,7 @@ class _BooksPageState extends State<Library> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      books[index]['author'],
+                      book.author,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.7),
                         fontSize: 12,
@@ -304,7 +379,7 @@ class _BooksPageState extends State<Library> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 8), // Reduced spacing
+                    const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -317,7 +392,7 @@ class _BooksPageState extends State<Library> {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              books[index]['duration'],
+                              book.duration,
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.6),
                                 fontSize: 12,
@@ -347,5 +422,11 @@ class _BooksPageState extends State<Library> {
         ),
       ),
     );
+  }
+
+  void _navigateToListenPage(BuildContext context, AudioBook book) {
+    HapticFeedback.mediumImpact();
+    // TODO: Implement navigation to listen page with book data
+    print('Navigating to listen page for: ${book.title}');
   }
 }
