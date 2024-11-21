@@ -40,7 +40,7 @@ class _HomeState extends State<Home> {
   Future<void> fetchBooks() async {
     setState(() => isLoading = true);
     try {
-      final response = await http.get(Uri.parse('http://localhost:8000/'));
+      final response = await http.get(Uri.parse('http://localhost:8000/api/v1'));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {

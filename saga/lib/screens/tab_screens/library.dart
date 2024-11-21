@@ -52,7 +52,7 @@ class _LibraryState extends State<Library> {
 
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:8000/popular?page=$currentPage'),
+        Uri.parse('http://localhost:8000/api/v1/popular?page=$currentPage'),
       );
 
       if (response.statusCode == 200) {
