@@ -17,6 +17,7 @@ class HomePageResponse(BaseModel):
     recent_books: List[AudioBook]
 
 class PopularBooksResponse(BaseModel):
+    featured_books: List[AudioBook]
+    recent_books: List[AudioBook]
     page: int
     total_pages: int
-    books: List[AudioBook]
