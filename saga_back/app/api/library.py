@@ -186,10 +186,6 @@ class LitteratureAudioScraper:
 
 scraper = LitteratureAudioScraper()
 
-@app.get("/")
-async def read_root():
-    return {"message": "Welcome to Littérature Audio API"}
-
 @app.get("/popular", response_model=BooksResponse)
 async def get_popular_books(page: int = 1):
     """Get most popular audio books with pagination"""
