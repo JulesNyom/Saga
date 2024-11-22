@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-from routers import router
+from .routers import router
 
 app = FastAPI(title="Littérature Audio API")
 

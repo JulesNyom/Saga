@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-from models import HomePageResponse, PopularBooksResponse
-from scraper import LitteratureAudioScraper
+from .models import HomePageResponse, PopularBooksResponse
+from .scraper import LitteratureAudioScraper
 
 router = APIRouter()
 scraper = LitteratureAudioScraper()

@@ -4,7 +4,7 @@ import re
 from typing import Optional, Set
 import html
 import json
-from models import AudioBook
+from .models import AudioBook
 
 class LitteratureAudioScraper:
     def __init__(self):
