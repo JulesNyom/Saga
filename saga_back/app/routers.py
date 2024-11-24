@@ -1,10 +1,37 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-from .models import HomePageResponse, PopularBooksResponse
+from .models import HomePageResponse, PopularBooksResponse, AudioBook
 from .scraper import LitteratureAudioScraper
 
 router = APIRouter()
 scraper = LitteratureAudioScraper()
+
+@router.get("/book/{book_id}", response_model=AudioBook)
+async def get_book(book_id: str):
+    """Get detailed book information including audio URLs"""
+    try:
+        # First try to find the book in the homepage
+        homepage_data = await scraper.scrape_homepage()
+        all_books = homepage_data['featured_books'] + homepage_data['recent_books']
+        
+        book = next((book for book in all_books if book['id'] == book_id), None)
+        
+        if not book:
+            # If not found, try the popular books
+            popular_data = await scraper.scrape_popular_books()
+            all_popular_books = popular_data['books']
+            book = next((book for book in all_popular_books if book['id'] == book_id), None)
+        
+        if not book:
+            raise HTTPException(status_code=404, detail="Book not found")
+            
+        return JSONResponse(
+            content=book,
+            headers={"Content-Type": "application/json; charset=utf-8"}
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/", response_model=HomePageResponse)
 async def get_books(limit: int = 20):

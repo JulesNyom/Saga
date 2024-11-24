@@ -1,10 +1,11 @@
 from bs4 import BeautifulSoup
 import requests
 import re
-from typing import Optional, Set
+from typing import Optional, Set, List
 import html
 import json
-from .models import AudioBook
+from .models import AudioBook, AudioChapter
+from fastapi import HTTPException
 
 class LitteratureAudioScraper:
     def __init__(self):
@@ -15,7 +16,128 @@ class LitteratureAudioScraper:
         }
         self.processed_ids: Set[str] = set()
 
-    def decode_text(self, text: str) -> str:
+    async def get_book_details(self, book_url: str) -> dict:
+        """Fetch detailed book information including audio URLs."""
+        try:
+            response = requests.get(book_url, headers=self.headers, timeout=10)
+            response.encoding = 'utf-8'
+            response.raise_for_status()
+            
+            soup = BeautifulSoup(response.text, 'lxml')
+            
+            # Extract description
+            description = soup.select_one('div.entry-content p')
+            description_text = description.text.strip() if description else ""
+            
+            # Extract chapters and audio URLs
+            chapters = []
+            chapter_elements = soup.select('div.audio-player')
+            
+            current_time = 0
+            for idx, chapter in enumerate(chapter_elements, 1):
+                # Extract audio URL
+                audio_element = chapter.select_one('audio source')
+                if audio_element and audio_element.get('src'):
+                    audio_url = audio_element['src']
+                else:
+                    continue
+                
+                # Extract chapter title
+                title_element = chapter.find_previous('h2') or chapter.find_previous('h3')
+                chapter_title = title_element.text.strip() if title_element else f"Chapter {idx}"
+                
+                # Extract duration
+                duration_element = chapter.select_one('span.duration')
+                duration = duration_element.text.strip() if duration_element else "00:00"
+                
+                # Calculate duration in seconds for chapter positioning
+                duration_parts = duration.split(':')
+                duration_seconds = sum(x * int(t) for x, t in zip([3600, 60, 1], duration_parts))
+                
+                chapters.append({
+                    "number": idx,
+                    "title": chapter_title,
+                    "duration": duration,
+                    "audio_url": audio_url,
+                    "start_time": current_time
+                })
+                
+                current_time += duration_seconds
+            
+            return {
+                "description": description_text,
+                "chapters": chapters
+            }
+                
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error fetching book details: {str(e)}")
+
+    async def extract_book_data(self, article) -> Optional[AudioBook]:
+        try:
+            post_id = article.get('data-id', '').replace('post-', '')
+            
+            if post_id in self.processed_ids:
+                return None
+            
+            self.processed_ids.add(post_id)
+            
+            # Extract basic book data as before
+            data = await self._extract_basic_book_data(article)
+            
+            # Fetch detailed book information including audio URLs
+            if data.get('url'):
+                details = await self.get_book_details(data['url'])
+                data.update(details)
+            
+            return AudioBook(
+                id=post_id,
+                title=data['title'],
+                author=data['author'],
+                imageUrl=data['image'],
+                duration=data['duration'],
+                views=data['views'],
+                url=data['url'],
+                narrator=data.get('narrator', ''),
+                date=data.get('date', ''),
+                description=data.get('description', ''),
+                chapters=[AudioChapter(**chapter) for chapter in data.get('chapters', [])]
+            )
+            
+        except Exception as e:
+            print(f"Error extracting data from article: {e}")
+            return None
+
+    async def _extract_basic_book_data(self, article) -> dict:
+        """Extract basic book information from article element."""
+        selectors = {
+            'title': ('h3.entry-title a', 'text'),
+            'url': ('h3.entry-title a', 'href'),
+            'image': ('img.wp-post-image', 'src'),
+            'duration': ('div.duration', 'text'),
+            'views': ('div.views', None),
+            'author': ('span.entry-auteur a', 'text'),
+            'narrator': ('span.entry-voix a', 'text'),
+            'date': ('span.posted-on a', 'text')
+        }
+        
+        data = {}
+        for key, (selector, attr) in selectors.items():
+            elem = article.select_one(selector)
+            if elem:
+                if attr == 'text':
+                    data[key] = self.decode_text(elem.text.strip())
+                elif attr == 'href':
+                    data[key] = elem['href']
+                elif attr == 'src':
+                    data[key] = self.clean_url(elem['src'])
+                elif key == 'views':
+                    data[key] = self.extract_views(elem)
+            else:
+                data[key] = "" if key in ['narrator', 'date'] else "Unknown"
+                
+        return data
+
+    def decode_text(self, text: str) -> str:        
         if not text:
             return ""
         
