@@ -1,76 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-class AudioBookDetails {
-  final String id;
-  final String title;
-  final String author;
-  final String imageUrl;
-  final String duration;
-  final String narrator;
-  final String description;
-  final List<AudioChapter> chapters;
-
-  AudioBookDetails({
-    required this.id,
-    required this.title,
-    required this.author,
-    required this.imageUrl,
-    required this.duration,
-    required this.narrator,
-    required this.description,
-    required this.chapters,
-  });
-
-  factory AudioBookDetails.fromJson(Map<String, dynamic> json) {
-    return AudioBookDetails(
-      id: json['id'],
-      title: json['title'],
-      author: json['author'],
-      imageUrl: json['imageUrl'],
-      duration: json['duration'],
-      narrator: json['narrator'] ?? '',
-      description: json['description'] ?? '',
-      chapters: (json['chapters'] as List)
-          .map((chapter) => AudioChapter.fromJson(chapter))
-          .toList(),
-    );
-  }
-}
-
-class AudioChapter {
-  final int number;
-  final String title;
-  final String duration;
-  final String audioUrl;
-  final double startTime;
-
-  AudioChapter({
-    required this.number,
-    required this.title,
-    required this.duration,
-    required this.audioUrl,
-    required this.startTime,
-  });
-
-  factory AudioChapter.fromJson(Map<String, dynamic> json) {
-    return AudioChapter(
-      number: json['number'],
-      title: json['title'],
-      duration: json['duration'],
-      audioUrl: json['audio_url'],
-      startTime: json['start_time'].toDouble(),
-    );
-  }
-}
 
 class Listening extends StatefulWidget {
-  final String bookId;
-
-  const Listening({super.key, required this.bookId});
+  const Listening({super.key});
 
   @override
   State<Listening> createState() => _ListenPageState();
@@ -80,16 +12,53 @@ class _ListenPageState extends State<Listening>
     with SingleTickerProviderStateMixin {
   late AnimationController _playPauseController;
   final ScrollController _scrollController = ScrollController();
-  final AudioPlayer _audioPlayer = AudioPlayer();
-  
-  AudioBookDetails? bookData;
-  int currentChapterIndex = 0;
   bool _isPlaying = false;
-  bool isLoading = true;
   double _currentSliderValue = 0.0;
   double _scrollOffset = 0.0;
-  Duration? _duration;
-  Duration? _position;
+
+  // Sample book data
+  final Map<String, dynamic> bookData = {
+    'title': 'Les Misérables',
+    'author': 'Victor Hugo',
+    'narrator': 'Jean Martin',
+    'currentChapter': 'Tome 1, Chapitre 3: L\'Évêque Myriel',
+    'duration': '24:30:15',
+    'currentTime': '08:45:30',
+    'description':
+        'Les Misérables est un roman de Victor Hugo publié en 1862, l\'un des plus vastes et des plus notables de la littérature française. Il décrit la vie de personnages misérables dans Paris et la France provinciale du XIXe siècle.',
+    'progress': 35.0,
+    'imageUrl':
+        'https://example.com/placeholder.jpg', // Replace with actual URL
+  };
+
+  final List<Map<String, dynamic>> chapters = [
+    {
+      'number': '1',
+      'title': 'Un Juste',
+      'duration': '1:32:15',
+    },
+    {
+      'number': '2',
+      'title': 'La Chute',
+      'duration': '1:41:30',
+    },
+    {
+      'number': '3',
+      'title': 'L\'Évêque Myriel',
+      'duration': '1:45:30',
+      'current': true,
+    },
+    {
+      'number': '4',
+      'title': 'Les Œuvres Semblables aux Paroles',
+      'duration': '1:38:45',
+    },
+    {
+      'number': '5',
+      'title': 'Que Monseigneur Bienvenu',
+      'duration': '1:36:20',
+    },
+  ];
 
   final List<Map<String, dynamic>> relatedBooks = [
     {
@@ -120,134 +89,31 @@ class _ListenPageState extends State<Listening>
       vsync: this,
     );
     _scrollController.addListener(_onScroll);
-    _setupAudioPlayer();
-    _fetchBookDetails();
   }
 
-  void _setupAudioPlayer() {
-    _audioPlayer.onPlayerStateChanged.listen((PlayerState state) {
-      setState(() {
-        _isPlaying = state == PlayerState.playing;
-        if (_isPlaying) {
-          _playPauseController.forward();
-        } else {
-          _playPauseController.reverse();
-        }
-      });
-    });
-
-    _audioPlayer.onDurationChanged.listen((Duration duration) {
-      setState(() {
-        _duration = duration;
-      });
-    });
-
-    _audioPlayer.onPositionChanged.listen((Duration position) {
-      setState(() {
-        _position = position;
-        if (_duration != null && _duration!.inSeconds > 0) {
-          _currentSliderValue =
-              position.inSeconds.toDouble() / _duration!.inSeconds.toDouble() * 100;
-        }
-      });
-    });
-
-    _audioPlayer.onPlayerComplete.listen((_) {
-      _playNextChapter();
-    });
-  }
-
-  Future<void> _fetchBookDetails() async {
-    try {
-      final response = await http.get(
-        Uri.parse('http://localhost:8000/api/v1/book/${widget.bookId}'),
-      );
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        setState(() {
-          bookData = AudioBookDetails.fromJson(data);
-          isLoading = false;
-        });
-        await _loadCurrentChapter();
-      } else {
-        throw Exception('Failed to load book details');
-      }
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading book: $e')),
-        );
-      }
-    }
-  }
-
-  Future<void> _loadCurrentChapter() async {
-    if (bookData == null || bookData!.chapters.isEmpty) return;
-    
-    final chapter = bookData!.chapters[currentChapterIndex];
-    await _audioPlayer.setSource(UrlSource(chapter.audioUrl));
-    await _audioPlayer.setReleaseMode(ReleaseMode.stop);
-  }
-
-  Future<void> _playNextChapter() async {
-    if (bookData == null || currentChapterIndex >= bookData!.chapters.length - 1) return;
-    
-    setState(() {
-      currentChapterIndex++;
-    });
-    await _loadCurrentChapter();
-    await _audioPlayer.resume();
-  }
-
-  Future<void> _playPreviousChapter() async {
-    if (bookData == null || currentChapterIndex <= 0) return;
-    
-    setState(() {
-      currentChapterIndex--;
-    });
-    await _loadCurrentChapter();
-    await _audioPlayer.resume();
-  }
-
-  Future<void> _seekToPosition(double value) async {
-    if (_duration == null) return;
-    
-    final position = Duration(
-      seconds: (value / 100 * _duration!.inSeconds).round(),
-    );
-    await _audioPlayer.seek(position);
-  }
-
-  Future<void> _togglePlayPause() async {
-    if (_isPlaying) {
-      await _audioPlayer.pause();
-    } else {
-      await _audioPlayer.resume();
-    }
-    HapticFeedback.mediumImpact();
-  }
-
-  Future<void> _skipForward() async {
-    if (_position == null) return;
-    final newPosition = _position! + const Duration(seconds: 30);
-    await _audioPlayer.seek(newPosition);
-  }
-
-  Future<void> _skipBackward() async {
-    if (_position == null) return;
-    final newPosition = _position! - const Duration(seconds: 10);
-    await _audioPlayer.seek(newPosition);
+  @override
+  void dispose() {
+    _playPauseController.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void _onScroll() {
-    if (!mounted) return;
     setState(() {
       _scrollOffset = _scrollController.offset;
     });
+  }
+
+  void _togglePlayPause() {
+    setState(() {
+      _isPlaying = !_isPlaying;
+      if (_isPlaying) {
+        _playPauseController.forward();
+      } else {
+        _playPauseController.reverse();
+      }
+    });
+    HapticFeedback.mediumImpact();
   }
 
   double get _appBarOpacity {
@@ -260,46 +126,8 @@ class _ListenPageState extends State<Listening>
     return (_scrollOffset - showAt) / (fullyVisibleAt - showAt);
   }
 
-  String _formatDuration(Duration? duration) {
-    if (duration == null) return '00:00:00';
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    String hours = twoDigits(duration.inHours);
-    String minutes = twoDigits(duration.inMinutes.remainder(60));
-    String seconds = twoDigits(duration.inSeconds.remainder(60));
-    return '$hours:$minutes:$seconds';
-  }
-
-  @override
-  void dispose() {
-    _playPauseController.dispose();
-    _scrollController.dispose();
-    _audioPlayer.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: CircularProgressIndicator(color: Colors.white),
-        ),
-      );
-    }
-
-    if (bookData == null) {
-      return const Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: Text(
-            'Error loading book',
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-      );
-    }
-
     return Scaffold(
       backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
@@ -364,8 +192,9 @@ class _ListenPageState extends State<Listening>
       child: Stack(
         fit: StackFit.expand,
         children: [
+          // Book Cover Image
           Image.network(
-            bookData!.imageUrl,
+            bookData['imageUrl'],
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) {
               return Container(
@@ -380,6 +209,7 @@ class _ListenPageState extends State<Listening>
               );
             },
           ),
+          // Gradient Overlay
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -393,6 +223,7 @@ class _ListenPageState extends State<Listening>
               ),
             ),
           ),
+          // Content
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(24.0),
@@ -401,10 +232,8 @@ class _ListenPageState extends State<Listening>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(20),
@@ -421,7 +250,7 @@ class _ListenPageState extends State<Listening>
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    bookData!.title,
+                    bookData['title'],
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 36,
@@ -439,7 +268,7 @@ class _ListenPageState extends State<Listening>
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        bookData!.author,
+                        bookData['author'],
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.9),
                           fontSize: 16,
@@ -472,7 +301,7 @@ class _ListenPageState extends State<Listening>
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  bookData!.chapters[currentChapterIndex].title,
+                  bookData['currentChapter'],
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -496,13 +325,12 @@ class _ListenPageState extends State<Listening>
               overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
             ),
             child: Slider(
-              value: _currentSliderValue.clamp(0.0, 100.0),
+              value: _currentSliderValue,
               onChanged: (value) {
                 setState(() {
                   _currentSliderValue = value;
                 });
               },
-              onChangeEnd: _seekToPosition,
               min: 0.0,
               max: 100.0,
             ),
@@ -513,7 +341,7 @@ class _ListenPageState extends State<Listening>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  _formatDuration(_position),
+                  bookData['currentTime'],
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.7),
                     fontSize: 13,
@@ -521,7 +349,7 @@ class _ListenPageState extends State<Listening>
                   ),
                 ),
                 Text(
-                  _formatDuration(_duration),
+                  bookData['duration'],
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.7),
                     fontSize: 13,
@@ -538,7 +366,7 @@ class _ListenPageState extends State<Listening>
               _buildControlButton(
                 icon: Icons.replay_10_outlined,
                 size: 32,
-                onPressed: _skipBackward,
+                onPressed: () {},
               ),
               GestureDetector(
                 onTap: _togglePlayPause,
@@ -569,7 +397,7 @@ class _ListenPageState extends State<Listening>
               _buildControlButton(
                 icon: Icons.forward_30_outlined,
                 size: 32,
-                onPressed: _skipForward,
+                onPressed: () {},
               ),
             ],
           ),
@@ -620,7 +448,7 @@ class _ListenPageState extends State<Listening>
           ),
           const SizedBox(height: 15),
           Text(
-            bookData!.description,
+            bookData['description'],
             style: const TextStyle(
               color: Colors.white70,
               fontSize: 16,
@@ -650,10 +478,10 @@ class _ListenPageState extends State<Listening>
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: bookData!.chapters.length,
+          itemCount: chapters.length,
           itemBuilder: (context, index) {
-            final chapter = bookData!.chapters[index];
-            final isCurrentChapter = index == currentChapterIndex;
+            final chapter = chapters[index];
+            final isCurrentChapter = chapter['current'] ?? false;
 
             return ListTile(
               contentPadding:
@@ -667,7 +495,7 @@ class _ListenPageState extends State<Listening>
                 ),
                 child: Center(
                   child: Text(
-                    chapter.number.toString(),
+                    chapter['number'],
                     style: TextStyle(
                       color: isCurrentChapter ? Colors.white : Colors.white70,
                       fontSize: 16,
@@ -679,7 +507,7 @@ class _ListenPageState extends State<Listening>
                 ),
               ),
               title: Text(
-                chapter.title,
+                chapter['title'],
                 style: TextStyle(
                   color: isCurrentChapter ? Colors.white : Colors.white70,
                   fontSize: 16,
@@ -688,19 +516,13 @@ class _ListenPageState extends State<Listening>
                 ),
               ),
               trailing: Text(
-                chapter.duration,
+                chapter['duration'],
                 style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 14,
                 ),
               ),
-              onTap: () async {
-                setState(() {
-                  currentChapterIndex = index;
-                });
-                await _loadCurrentChapter();
-                await _audioPlayer.resume();
-              },
+              onTap: () {},
             );
           },
         ),
@@ -743,6 +565,7 @@ class _ListenPageState extends State<Listening>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Book Cover
                         Expanded(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(20),
@@ -765,6 +588,7 @@ class _ListenPageState extends State<Listening>
                                     );
                                   },
                                 ),
+                                // Gradient Overlay
                                 Container(
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
@@ -781,6 +605,7 @@ class _ListenPageState extends State<Listening>
                             ),
                           ),
                         ),
+                        // Book Info
                         Padding(
                           padding: const EdgeInsets.all(8),
                           child: Column(
@@ -881,7 +706,7 @@ class _ListenPageState extends State<Listening>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        bookData!.narrator,
+                        bookData['narrator'],
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
